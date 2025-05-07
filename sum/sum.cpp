@@ -3,7 +3,7 @@
 #include <sys/time.h>
 #include "opencl.h"
 
-const char* CL_KERNEL_SOURCE = "clsum.cl";
+const char* CL_KERNEL_SOURCE = "sum.cl";
 const char* CL_KERNEL_NAME = "array_add";
 
 const size_t SIZE = 100'000'000; // Array size
