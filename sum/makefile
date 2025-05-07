@@ -9,8 +9,8 @@ opencl=-I/usr/include/CL -L/usr/lib -lOpenCL
 .DEFAULT_GOAL := %$(ext)
 .PHONY: all
 
-%$(ext): %.cpp opencl.o
-	g++ $(opencl) $^ -o $@
+%$(ext): %.cpp ../lib/opencl.o
+	g++ $(opencl) $^ -o $@ -h ../lib
 
-opencl.o: opencl.cpp opencl.h
-	g++ $(opencl) -c opencl.cpp -o opencl.o
+../lib/opencl.o: ../lib/opencl.cpp ../lib/opencl.h
+	g++ $(opencl) -c ../lib/opencl.cpp -o ../lib/opencl.o
