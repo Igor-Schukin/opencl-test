@@ -10,7 +10,7 @@ opencl=-I/usr/include/CL -L/usr/lib -lOpenCL
 .PHONY: all
 
 %$(ext): %.cpp ../lib/opencl.o
-	g++ $(opencl) $^ -o $@ -h ../lib
+	g++ -I../lib $(opencl) $^ -o $@ 
 
 ../lib/opencl.o: ../lib/opencl.cpp ../lib/opencl.h
 	g++ $(opencl) -c ../lib/opencl.cpp -o ../lib/opencl.o
