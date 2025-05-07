@@ -17,15 +17,17 @@ size_t getTime()
 
 int main()
 {
-    printf("Let's go with GPU!\n");
+    size_t tsStart, tsEnd;
 
     // Input data
     int a[SIZE], b[SIZE], result[SIZE];
     for (int i = 0; i < SIZE; i++) { a[i] = 2 * i; b[i] = -i; }
 
+    printf("~~~~~ Let's go with OpenCL\n");
+
     OpenCL job(CL_KERNEL_SOURCE, CL_KERNEL_NAME);
 
-    size_t tsStart = getTime();
+    tsStart = getTime();
     job.run(
         SIZE,
         {
@@ -35,12 +37,30 @@ int main()
             {ArgTypes::INT,      (void*)&SIZE,  1    }
         }
     );
-    size_t tsEnd = getTime();
+    tsEnd = getTime();
+    size_t tsWopenCL = tsEnd - tsStart;
 
-    // Print first 10 results
     printf("First 10 results:\n");
     for (int i = 0; i < 10 && i < SIZE; i++) printf("result[%d] = %d\n", i, result[i]);
 
-    printf("Kernel execution time: %zu ms\nBye!\n", tsEnd - tsStart);
+    printf("~~~~~ Let's go without OpenCL\n");
+
+    tsStart = getTime();
+    for (int i = 0; i < SIZE; i++)
+    {
+        result[i] = a[i] + b[i]; 
+    }   
+    tsEnd = getTime();
+    size_t tsWOopenCL = tsEnd - tsStart;
+
+    printf("First 10 results:\n");
+    for (int i = 0; i < 10 && i < SIZE; i++)
+    {
+        printf("result[%d] = %d\n", i, result[i]);
+    }
+
+    printf("~~~~~ Execution time\n");
+    printf("     with OpenCL: %zu ms\nBye!\n", tsWopenCL);
+    printf("  without OpenCL: %zu ms\nBye!\n", tsWOopenCL);
     return 0;
 }
