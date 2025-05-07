@@ -3,7 +3,7 @@
 #PBS -o $prog.out
 #PBS -e $prog.err
  
-cd ./$dir
+cd ./opencl-test/$dir
 start=$(date +%s%3N)
 ./$prog
 end=$(date +%s%3N)
