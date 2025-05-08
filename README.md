@@ -1,4 +1,4 @@
-# Tests and Examples of OpenCL Usage on the RTU HPC Platform
+# Examples of OpenCL Usage on the RTU HPC Platform
 
 ## OpenCL Verification
 1. Register in the RTU HPC system
