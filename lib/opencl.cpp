@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "opencl.h"
+#include <sys/time.h>
+
+//~~~~~ Get current time in milliseconds ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+size_t getTime()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (size_t)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
 
 //~~~~~ OpenCL error class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -118,8 +128,9 @@ void OpenCL::release()
 //~~~~~ Run OpenCL kernel with given arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void OpenCL::run(
-    size_t workSize,
-    std::vector<std::tuple<ArgTypes, void*, size_t>> args
+    std::vector<std::tuple<ArgTypes, void*, size_t>> args,
+    size_t dimSize,
+    cl_uint workDim = 1
 )
 {
     std::vector<cl_mem> buffers;
@@ -169,7 +180,10 @@ void OpenCL::run(
 
         // Execute kernel
 
-        err = clEnqueueNDRangeKernel(_queue, _kernel, 1, NULL, &workSize, NULL, 0, NULL, NULL);
+        size_t *workSize = new size_t[workDim];
+        for (cl_uint i = 0; i < workDim; i++) workSize[i] = dimSize;
+        err = clEnqueueNDRangeKernel(_queue, _kernel, workDim, NULL, workSize, NULL, 0, NULL, NULL);
+        delete[] workSize;
         checkError(err, "clEnqueueNDRangeKernel");
         
         // Read result

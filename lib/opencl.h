@@ -9,6 +9,8 @@
 
 enum class ArgTypes { INT, IN_IBUF, OUT_IBUF };
 
+export size_t getTime()
+
 class OpenClError : public std::runtime_error {
 public:
     OpenClError(cl_int err, const std::string& operation);

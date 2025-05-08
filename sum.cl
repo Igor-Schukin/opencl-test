@@ -1,6 +1,6 @@
 // OpenCL kernel for adding two integer arrays
 
-__kernel void array_add(
+__kernel void sum(
     __global const int *a, 
     __global const int *b,
     __global int *result, 

@@ -1,19 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include "opencl.h"
 
 const char* CL_KERNEL_SOURCE = "sum.cl";
-const char* CL_KERNEL_NAME = "array_add";
+const char* CL_KERNEL_NAME = "sum";
 
 const size_t SIZE = 100'000'000; // Array size
-
-size_t getTime()
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (size_t)tv.tv_sec * 1000 + tv.tv_usec / 1000;
-}
 
 int main()
 {
@@ -29,13 +21,13 @@ int main()
 
     tsStart = getTime();
     job.run(
-        SIZE,
         {
             {ArgTypes::IN_IBUF,  (void*)a,      SIZE },
             {ArgTypes::IN_IBUF,  (void*)b,      SIZE },
             {ArgTypes::OUT_IBUF, (void*)result, SIZE },
             {ArgTypes::INT,      (void*)&SIZE,  1    }
-        }
+        },
+        SIZE
     );
     tsEnd = getTime();
     size_t tsWopenCL = tsEnd - tsStart;
