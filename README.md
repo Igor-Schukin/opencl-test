@@ -3,7 +3,7 @@
 ## OpenCL Verification
 1. Register in the RTU HPC system
    ```
-   ssh *user-name*@ui-2.hpc.rtu.lv
+   ssh <user-name>@ui-2.hpc.rtu.lv
    ```
 1. Clone the project if it hasn't been cloned yet
    ```
@@ -37,9 +37,9 @@
    .\run.sh *example-name*
    ```
 1. After the example program is completed (`Bye` should appear on the screen), end it by pressing `Ctrl+C`
-1. The test results can be seen on the screen and in the `*example-name*.out` file
+1. The test results can be seen on the screen and in the `<example-name>.out` file
    ```
-   cat *example-name*.out
+   cat <example-name>.out
    ```
 
 ## Implemented Examples
