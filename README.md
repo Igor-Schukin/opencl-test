@@ -9,7 +9,7 @@
    ```
    git clone git@github.com:Igor-Schukin/opencl-test.git
    ```
-1. Navigate to the `opencl-test` folder
+1. Navigate to the `opencl-test` folder with test
    ```
    cd opencl-test\cltest
    ```
@@ -31,6 +31,10 @@
 1. Clone the project if it hasn't been cloned yet
    ```
    git clone git@github.com:Igor-Schukin/opencl-test.git
+   ```
+1. Navigate to the `opencl-test` folder
+   ```
+   cd opencl-test
    ```
 1. Compile and run one of the examples
    ```
