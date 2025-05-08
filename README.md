@@ -37,7 +37,7 @@
    .\run.sh <example-name>
    ```
 1. After the example program is completed (`Bye` should appear on the screen), end it by pressing `Ctrl+C`
-1. The test results can be seen on the screen and in the `<example-name>.out` file
+1. The results can be seen on the screen and in the `<example-name>.out` file
    ```
    cat <example-name>.out
    ```
@@ -48,4 +48,4 @@ The project includes the following examples of OpenCL usage for data processing:
    - the vectors have 100 million elements, filled with integers: `a[i] = 2i`, `b[i] = -i`;  
    - as a result, the sum vector should contain integers `0, 1, 2...`;  
    - for verification, the first 10 elements of the resulting vector are displayed on the screen;  
-   - the tims required for computation using the GPU and the CPU are measured.
+   - the times required for computation using the GPU and the CPU are measured.
