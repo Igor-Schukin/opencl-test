@@ -149,6 +149,7 @@ void OpenCL::run(
 
             if (type == ArgTypes::IN_IBUF) buffer = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * size, value, &err);
             else if (type == ArgTypes::OUT_IBUF) buffer = clCreateBuffer(_context, CL_MEM_WRITE_ONLY, sizeof(int) * size, NULL, &err);
+//          else if (type == ArgTypes::OUT_IBUF) buffer = clCreateBuffer(_context, CL_MEM_READ_WRITE | CL_MEM_HOST_READ_ONLY, sizeof(int) * size, NULL, &err);
             else { buffer = 0; err = CL_SUCCESS; }
             checkError(err, "clCreateBuffer");
             buffers.push_back(buffer);

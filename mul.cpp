@@ -14,13 +14,13 @@ void printMatrix(int* matrix)
 {
     for (size_t i = 0; i < DIM; i++)
     {
+        if (i >= 10) { printf("....\n"); break; }
         for (size_t j = 0; j < DIM; j++)
         {
-            printf("%4d ", matrix[ID(i,j)]);
-            if (j >= 9) { printf(" ...."); break; }
+            if (j >= 10) { printf(" ...."); break; }
+            printf("%6d ", matrix[ID(i,j)]);
         }
         printf("\n");
-        if (i >= 9) { printf("....\n"); break; }
     }
 }
 
@@ -32,6 +32,7 @@ int main()
 
     // Input data
 
+//    int a[SIZE]{1,2,3,4}, b[SIZE]{5,6,7,8}, result[SIZE]{};
     int a[SIZE], b[SIZE], result[SIZE];
     for (int i = 0; i < SIZE; i++)
     {
@@ -49,7 +50,7 @@ int main()
             {ArgTypes::IN_IBUF,  (void*)a,      SIZE },
             {ArgTypes::IN_IBUF,  (void*)b,      SIZE },
             {ArgTypes::OUT_IBUF, (void*)result, SIZE },
-            {ArgTypes::INT,      (void*)&SIZE,  1    }
+            {ArgTypes::INT,      (void*)&DIM,   1    }
         },
         DIM,
         3
@@ -57,7 +58,6 @@ int main()
     tsEnd = getTime();
     size_t tsWopenCL = tsEnd - tsStart;
 
-    printf("OpenCL result:\n");
     printMatrix(result);
 
     printf("\n~~~~~ Let's go without OpenCL\n");
@@ -73,7 +73,6 @@ int main()
     tsEnd = getTime();
     size_t tsWOopenCL = tsEnd - tsStart;
 
-    printf("CPU result:\n");
     printMatrix(refResult);
 
     bool isEqual = true;

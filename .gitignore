@@ -6,4 +6,5 @@
 *.out
 *.err
 sum
+mul
 cltest
