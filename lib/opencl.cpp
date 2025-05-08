@@ -130,7 +130,7 @@ void OpenCL::release()
 void OpenCL::run(
     std::vector<std::tuple<ArgTypes, void*, size_t>> args,
     size_t dimSize,
-    cl_uint workDim = 1
+    cl_uint workDim
 )
 {
     std::vector<cl_mem> buffers;

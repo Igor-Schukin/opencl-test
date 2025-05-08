@@ -9,7 +9,7 @@
 
 enum class ArgTypes { INT, IN_IBUF, OUT_IBUF };
 
-export size_t getTime()
+size_t getTime();
 
 class OpenClError : public std::runtime_error {
 public:
@@ -35,7 +35,7 @@ public:
     OpenCL(const std::string& kernelSourceFile, const std::string& kernelName);
     ~OpenCL();
 
-    void run(size_t workSize, std::vector<std::tuple<ArgTypes, void*, size_t>> args);
+    void run(std::vector<std::tuple<ArgTypes, void*, size_t>> args, size_t dimSize, cl_uint workDim  = 1);
 };
 
 #endif // OPENCL_H
