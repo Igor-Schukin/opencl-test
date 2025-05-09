@@ -53,3 +53,9 @@ The project includes the following examples of OpenCL usage for data processing:
    - as a result, the sum vector should contain integers `0, 1, 2...`;  
    - for verification, the first 10 elements of the resulting vector are displayed on the screen;  
    - the times required for computation using the GPU and the CPU are measured.
+1. ***mul*** - an example of parallel computation of the two matrix `a` and `b` multiplication:
+   - the matrix dimensions are 2500x2500;  
+   - the matrices are filled with random integers in the range from -100 to +100;  
+   - the product is calculated using both the OpenCL kernel and CPU loops;  
+   - the results of the OpenCL kernel and CPU calculations are compared;  
+   - for verification, parts of the resulting matrices of size 10x10 are displayed on the screen.
