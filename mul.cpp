@@ -6,7 +6,7 @@
 const char* CL_KERNEL_SOURCE = "mul.cl";
 const char* CL_KERNEL_NAME = "mul";
 
-const size_t DIM  = 100;       // 2D square matrix dimension
+const size_t DIM  = 2500;      // 2D square matrix dimension
 const size_t SIZE = DIM * DIM; // 1D array size for square matrix
 #define ID(r, c) ((r)*DIM+(c)) // 1D index for 2D matrix
 
@@ -18,7 +18,7 @@ void printMatrix(int* matrix)
         for (size_t j = 0; j < DIM; j++)
         {
             if (j >= 10) { printf(" ...."); break; }
-            printf("%6d ", matrix[ID(i,j)]);
+            printf("%8d ", matrix[ID(i,j)]);
         }
         printf("\n");
     }
