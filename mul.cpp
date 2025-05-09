@@ -26,72 +26,89 @@ void printMatrix(int* matrix)
 
 int main()
 {
-    srand(time(NULL));
+    try { 
 
-    size_t tsStart, tsEnd;
+        srand(time(NULL));
 
-    // Input data
+        size_t tsStart, tsEnd;
 
-    int a[SIZE], b[SIZE], result[SIZE];
-    for (int i = 0; i < SIZE; i++)
-    {
-        a[i] = rand() % 201 - 100; 
-        b[i] = rand() % 201 - 100;
-    }
+        // Input data
 
-    printf("\n~~~~~ Let's go with OpenCL\n");
-
-    OpenCL job(CL_KERNEL_SOURCE, CL_KERNEL_NAME);
-
-    tsStart = getTime();
-    job.run(
+        int a[SIZE], b[SIZE], result[SIZE];
+        for (int i = 0; i < SIZE; i++)
         {
-            {ArgTypes::IN_IBUF,  (void*)a,      SIZE },
-            {ArgTypes::IN_IBUF,  (void*)b,      SIZE },
-            {ArgTypes::OUT_IBUF, (void*)result, SIZE },
-            {ArgTypes::INT,      (void*)&DIM,   1    }
-        },
-        DIM,
-        3
-    );
-    tsEnd = getTime();
-    size_t tsWopenCL = tsEnd - tsStart;
-
-    printMatrix(result);
-
-    printf("\n~~~~~ Let's go without OpenCL\n");
-
-    int refResult[SIZE]{};
-
-    tsStart = getTime();
-    for (size_t r = 0; r < DIM; r++)
-        for (size_t c = 0; c < DIM; c++)
-            for (size_t k = 0; k < DIM; k++)
-                refResult[ID(r,c)] += a[ID(r,k)] * b[ID(k,c)];
-
-    tsEnd = getTime();
-    size_t tsWOopenCL = tsEnd - tsStart;
-
-    printMatrix(refResult);
-
-    bool isEqual = true;
-    for (size_t i = 0; i < SIZE; i++)
-    {
-        if (result[i] != refResult[i])
-        {
-            isEqual = false;
-            break;
+            a[i] = rand() % 201 - 100; 
+            b[i] = rand() % 201 - 100;
         }
+
+        printf("\n~~~~~ Let's go with OpenCL\n");
+
+        OpenCL job(CL_KERNEL_SOURCE, CL_KERNEL_NAME);
+
+        tsStart = getTime();
+        job.run(
+            {
+                {ArgTypes::IN_IBUF,  (void*)a,      SIZE },
+                {ArgTypes::IN_IBUF,  (void*)b,      SIZE },
+                {ArgTypes::OUT_IBUF, (void*)result, SIZE },
+                {ArgTypes::INT,      (void*)&DIM,   1    }
+            },
+            DIM,
+            3
+        );
+        tsEnd = getTime();
+        size_t tsWopenCL = tsEnd - tsStart;
+
+        printMatrix(result);
+
+        printf("\n~~~~~ Let's go without OpenCL\n");
+
+        int refResult[SIZE]{};
+
+        tsStart = getTime();
+        for (size_t r = 0; r < DIM; r++)
+            for (size_t c = 0; c < DIM; c++)
+                for (size_t k = 0; k < DIM; k++)
+                    refResult[ID(r,c)] += a[ID(r,k)] * b[ID(k,c)];
+
+        tsEnd = getTime();
+        size_t tsWOopenCL = tsEnd - tsStart;
+
+        printMatrix(refResult);
+
+        bool isEqual = true;
+        for (size_t i = 0; i < SIZE; i++)
+        {
+            if (result[i] != refResult[i])
+            {
+                isEqual = false;
+                break;
+            }
+        }
+
+        printf("\n~~~~~ Results comparison\n");
+        if (isEqual) printf("   OpenCL and CPU result are the same\n");
+        else printf("   OpenCL and CPU results differ!\n");
+
+        printf("\n~~~~~ Execution time\n");
+        printf("     with OpenCL: %zu ms\n", tsWopenCL);
+        printf("  without OpenCL: %zu ms\n", tsWOopenCL);
+        printf("\n~~~~~ Bye!\n");
     }
-
-    printf("\n~~~~~ Results comparison\n");
-    if (isEqual) printf("   OpenCL and CPU result are the same\n");
-    else printf("   OpenCL and CPU results differ!\n");
-
-    printf("\n~~~~~ Execution time\n");
-    printf("     with OpenCL: %zu ms\n", tsWopenCL);
-    printf("  without OpenCL: %zu ms\n", tsWOopenCL);
-    printf("\n~~~~~ Bye!\n");
-
+    catch (const OpenClError& e)
+    {
+        printf("OpenCL error: %s\n", e.what());
+        return 1;
+    }
+    catch (const std::exception& e)
+    {
+        printf("Error: %s\n", e.what());
+        return 1;
+    }
+    catch (...)
+    {
+        printf("Unknown error\n");
+        return 1;
+    }
     return 0;
 }
