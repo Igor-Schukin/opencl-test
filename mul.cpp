@@ -32,7 +32,6 @@ int main()
 
     // Input data
 
-//    int a[SIZE]{1,2,3,4}, b[SIZE]{5,6,7,8}, result[SIZE]{};
     int a[SIZE], b[SIZE], result[SIZE];
     for (int i = 0; i < SIZE; i++)
     {
