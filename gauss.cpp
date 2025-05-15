@@ -34,7 +34,7 @@ int main()
 
         // Input data
 
-        float m[SIZE], result[DIM];
+        float m = new float[SIZE], result = new float[DIM];
         for (int i = 0; i < SIZE; i++)
         {
             m[i] = (rand() % 2001 - 1000) / 100.0f;
@@ -47,10 +47,9 @@ int main()
         tsStart = getTime();
         job.run(
             {
-                {ArgTypes::IN_IBUF,  (void*)a,      SIZE },
-                {ArgTypes::IN_IBUF,  (void*)b,      SIZE },
-                {ArgTypes::OUT_IBUF, (void*)result, SIZE },
-                {ArgTypes::INT,      (void*)&DIM,   1    }
+                {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
+                {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
+                {ArgTypes::INT,          (void*)&DIM,   1    }
             },
             DIM,
             3
@@ -59,7 +58,7 @@ int main()
         size_t tsWopenCL = tsEnd - tsStart;
 
         printMatrix(result);
-
+/*
         printf("\n~~~~~ Let's go without OpenCL\n");
 
         int refResult[SIZE]{};
@@ -84,6 +83,9 @@ int main()
                 break;
             }
         }
+*/
+        delete [] m;
+        delete [] result;
 
         printf("\n~~~~~ Results comparison\n");
         if (isEqual) printf("   OpenCL and CPU result are the same\n");

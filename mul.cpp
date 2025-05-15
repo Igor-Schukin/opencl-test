@@ -34,7 +34,7 @@ int main()
 
         // Input data
 
-        int a[SIZE], b[SIZE], result[SIZE];
+        int a = new int[SIZE], b = new int[SIZE], result = new int[SIZE];
         for (int i = 0; i < SIZE; i++)
         {
             a[i] = rand() % 201 - 100; 
@@ -84,6 +84,10 @@ int main()
                 break;
             }
         }
+
+        delete[] a;
+        delete[] b;
+        delete[] result;
 
         printf("\n~~~~~ Results comparison\n");
         if (isEqual) printf("   OpenCL and CPU result are the same\n");
