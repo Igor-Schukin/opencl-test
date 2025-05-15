@@ -129,8 +129,8 @@ void OpenCL::release()
 
 void OpenCL::run(
     std::vector<std::tuple<ArgTypes, void*, size_t>> args,
-    size_t dimSize,
-    cl_uint workDim
+    const std::vector<size_t>& globalSize,
+    const std::vector<size_t>& localSize
 )
 {
     std::vector<cl_mem> buffers;
@@ -181,10 +181,18 @@ void OpenCL::run(
 
         // Execute kernel
 
-        size_t *workSize = new size_t[workDim];
-        for (cl_uint i = 0; i < workDim; i++) workSize[i] = dimSize;
-        err = clEnqueueNDRangeKernel(_queue, _kernel, workDim, NULL, workSize, NULL, 0, NULL, NULL);
+        cl_uint workDim = static_cast<cl_uint>(globalSize.size());
+        size_t *workSize = new size_t[workDim]; 
+        for (cl_uint i = 0; i < workDim; i++) workSize[i] = globalSize[i];
+        size_t *groupSize = NULL;
+        if (!localSize.empty())
+        {
+            groupSize = new size_t[workDim];
+            for (cl_uint i = 0; i < workDim; i++) groupSize[i] = localSize[i];
+        }
+        err = clEnqueueNDRangeKernel(_queue, _kernel, workDim, NULL, workSize, groupSize, 0, NULL, NULL);
         delete[] workSize;
+        if (groupSize) delete[] groupSize;
         checkError(err, "clEnqueueNDRangeKernel");
         
         // Read result

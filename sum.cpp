@@ -27,7 +27,7 @@ int main()
             {ArgTypes::OUT_IBUF, (void*)result, SIZE },
             {ArgTypes::INT,      (void*)&SIZE,  1    }
         },
-        SIZE
+        { SIZE }
     );
     tsEnd = getTime();
     size_t tsWopenCL = tsEnd - tsStart;

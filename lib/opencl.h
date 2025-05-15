@@ -35,7 +35,7 @@ public:
     OpenCL(const std::string& kernelSourceFile, const std::string& kernelName);
     ~OpenCL();
 
-    void run(std::vector<std::tuple<ArgTypes, void*, size_t>> args, size_t dimSize, cl_uint workDim  = 1);
+    void run(std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize = {});
 };
 
 #endif // OPENCL_H

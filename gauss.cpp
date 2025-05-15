@@ -3,22 +3,22 @@
 #include <time.h>
 #include "opencl.h"
 
-const char* CL_KERNEL_SOURCE = "mul.cl";
-const char* CL_KERNEL_NAME = "mul";
+const char* CL_KERNEL_SOURCE = "gauss.cl";
+const char* CL_KERNEL_NAME = "toTriangular";
 
-const size_t DIM  = 2500;      // 2D square matrix dimension
-const size_t SIZE = DIM * DIM; // 1D array size for square matrix
-#define ID(r, c) ((r)*DIM+(c)) // 1D index for 2D matrix
+const size_t DIM  = 100;               // 2D square matrix dimension
+const size_t SIZE = DIM * (DIM + 1);   // 1D array size for square matrix
+#define ID(r, c) ((r)*(DIM+1)+(c))     // 1D index for 2D matrix
 
-void printMatrix(int* matrix)
+void printMatrix(float* matrix)
 {
     for (size_t i = 0; i < DIM; i++)
     {
         if (i >= 10) { printf("....\n"); break; }
-        for (size_t j = 0; j < DIM; j++)
+        for (size_t j = 0; j < DIM + 1; j++)
         {
             if (j >= 10) { printf(" ...."); break; }
-            printf("%8d ", matrix[ID(i,j)]);
+            printf("%10.2f ", matrix[ID(i,j)]);
         }
         printf("\n");
     }
@@ -34,11 +34,10 @@ int main()
 
         // Input data
 
-        int a[SIZE], b[SIZE], result[SIZE];
+        float m[SIZE], result[DIM];
         for (int i = 0; i < SIZE; i++)
         {
-            a[i] = rand() % 201 - 100; 
-            b[i] = rand() % 201 - 100;
+            m[i] = (rand() % 2001 - 1000) / 100.0f;
         }
 
         printf("\n~~~~~ Let's go with OpenCL\n");
@@ -53,7 +52,8 @@ int main()
                 {ArgTypes::OUT_IBUF, (void*)result, SIZE },
                 {ArgTypes::INT,      (void*)&DIM,   1    }
             },
-            { DIM, DIM, DIM }
+            DIM,
+            3
         );
         tsEnd = getTime();
         size_t tsWopenCL = tsEnd - tsStart;
