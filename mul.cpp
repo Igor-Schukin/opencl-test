@@ -34,7 +34,7 @@ int main()
 
         // Input data
 
-        int a = new int[SIZE], b = new int[SIZE], result = new int[SIZE];
+        int *a = new int[SIZE], *b = new int[SIZE], *result = new int[SIZE];
         for (int i = 0; i < SIZE; i++)
         {
             a[i] = rand() % 201 - 100; 

@@ -12,7 +12,7 @@ int main()
     size_t tsStart, tsEnd;
 
     // Input data
-    int a = new int[SIZE], b = new int[SIZE], result = new int[SIZE];
+    int *a = new int[SIZE], *b = new int[SIZE], *result = new int[SIZE];
     for (int i = 0; i < SIZE; i++) { a[i] = 2 * i; b[i] = -i; }
 
     printf("\n~~~~~ Let's go with OpenCL\n");
@@ -54,7 +54,7 @@ int main()
     delete[] a;
     delete[] b;
     delete[] result;
-    
+
     printf("\n~~~~~ Execution time\n");
     printf("     with OpenCL: %zu ms\n", tsWopenCL);
     printf("  without OpenCL: %zu ms\n", tsWOopenCL);

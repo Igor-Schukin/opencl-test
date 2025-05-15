@@ -34,7 +34,7 @@ int main()
 
         // Input data
 
-        float m = new float[SIZE], result = new float[DIM];
+        float *m = new float[SIZE], *result = new float[DIM];
         for (int i = 0; i < SIZE; i++)
         {
             m[i] = (rand() % 2001 - 1000) / 100.0f;
