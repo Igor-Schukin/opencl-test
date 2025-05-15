@@ -147,7 +147,7 @@ void OpenCL::run(
             void* value = std::get<1>(arg);
             size_t size = std::get<2>(arg);
 
-            swith (type)
+            switch (type)
             {
                 case ArgTypes::IN_IBUF:
                     buffer = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * size, value, &err);
@@ -241,7 +241,7 @@ void OpenCL::run(
                     break;
                 case ArgTypes::OUT_FBUF:
                 case ArgTypes::IN_OUT_FBUF:
-                    err = clEnqueueReadBuffer(_queue, buffers[index], CL_TRUE, 0, sizeof)float) * size, value, 0, NULL, NULL);
+                    err = clEnqueueReadBuffer(_queue, buffers[index], CL_TRUE, 0, sizeof(float) * size, value, 0, NULL, NULL);
                     break;
                 default:
                     err = CL_SUCCESS;
