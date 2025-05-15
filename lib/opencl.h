@@ -7,7 +7,7 @@
 #include <vector>
 #include <tuple>
 
-enum class ArgTypes { INT, IN_IBUF, OUT_IBUF };
+enum class ArgTypes { INT, IN_IBUF, OUT_IBUF, IN_OUT_IBUF, IN_FBUF, OUT_FBUF, IN_OUT_FBUF };
 
 size_t getTime();
 

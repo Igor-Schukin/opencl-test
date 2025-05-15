@@ -147,10 +147,36 @@ void OpenCL::run(
             void* value = std::get<1>(arg);
             size_t size = std::get<2>(arg);
 
+            swith (type)
+            {
+                case ArgTypes::IN_IBUF:
+                    buffer = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * size, value, &err);
+                    break;
+                case ArgTypes::OUT_IBUF:
+                    buffer = clCreateBuffer(_context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(int) * size, value, &err);
+                    break;
+                case ArgTypes::IN_OUT_IBUF:
+                    buffer = clCreateBuffer(_context, CL_MEM_READ_WRITE, sizeof(int) * size, value, &err);
+                    break;
+                case ArgTypes::IN_FBUF:
+                    buffer = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * size, value, &err);
+                    break;
+                case ArgTypes::OUT_FBUF:
+                    buffer = clCreateBuffer(_context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(float) * size, value, &err);
+                    break;
+                case ArgTypes::IN_OUT_FBUF:
+                    buffer = clCreateBuffer(_context, CL_MEM_READ_WRITE, sizeof(float) * size, value, &err);
+                    break;
+                default:
+                    buffer = 0;
+                    err = CL_SUCCESS;
+            }
+/*
             if (type == ArgTypes::IN_IBUF) buffer = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * size, value, &err);
             else if (type == ArgTypes::OUT_IBUF) buffer = clCreateBuffer(_context, CL_MEM_WRITE_ONLY, sizeof(int) * size, NULL, &err);
 //          else if (type == ArgTypes::OUT_IBUF) buffer = clCreateBuffer(_context, CL_MEM_READ_WRITE | CL_MEM_HOST_READ_ONLY, sizeof(int) * size, NULL, &err);
             else { buffer = 0; err = CL_SUCCESS; }
+*/
             checkError(err, "clCreateBuffer");
             buffers.push_back(buffer);
         }
@@ -171,6 +197,10 @@ void OpenCL::run(
                     break;
                 case ArgTypes::IN_IBUF:
                 case ArgTypes::OUT_IBUF:
+                case ArgTypes::IN_OUT_IBUF:
+                case ArgTypes::IN_FBUF:
+                case ArgTypes::OUT_FBUF:
+                case ArgTypes::IN_OUT_FBUF:
                     err = clSetKernelArg(_kernel, index, sizeof(cl_mem), &buffers[index]);
                     break;
                 default:
@@ -203,11 +233,28 @@ void OpenCL::run(
             ArgTypes type = std::get<0>(arg);
             void* value = std::get<1>(arg);
             size_t size = std::get<2>(arg);
-            if (type == ArgTypes::OUT_IBUF)
+
+            switch (type) {
+                case ArgTypes::OUT_IBUF:
+                case ArgTypes::IN_OUT_IBUF:
+                    err = clEnqueueReadBuffer(_queue, buffers[index], CL_TRUE, 0, sizeof(int) * size, value, 0, NULL, NULL);
+                    break;
+                case ArgTypes::OUT_FBUF:
+                case ArgTypes::IN_OUT_FBUF:
+                    err = clEnqueueReadBuffer(_queue, buffers[index], CL_TRUE, 0, sizeof)float) * size, value, 0, NULL, NULL);
+                    break;
+                default:
+                    err = CL_SUCCESS;
+            }
+
+            checkError(err, "clEnqueueReadBuffer");
+/*
+            if (type == ArgTypes::OUT_IBUF || type == ArgTypes::IN_OUT_IBUF)
             {
                 err = clEnqueueReadBuffer(_queue, buffers[index], CL_TRUE, 0, sizeof(int) * size, value, 0, NULL, NULL);
                 checkError(err, "clEnqueueReadBuffer");
             }
+*/
         }
 
         // Free buffers
