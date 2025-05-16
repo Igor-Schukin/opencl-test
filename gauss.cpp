@@ -51,7 +51,8 @@ int main()
                 {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
                 {ArgTypes::INT,          (void*)&DIM,   1    }
             },
-            DIM,
+            { DIM, DIM, DIM+1 },
+            { 1, 1, DIM+1 }
             3
         );
         tsEnd = getTime();
