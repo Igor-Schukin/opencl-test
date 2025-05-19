@@ -126,7 +126,7 @@ void OpenCL::release()
     freeBuffers();
 }
 
-//~~~~~ Create and free buffers for kernel arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~ Create buffers for kernel arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void OpenCL::createBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args) 
 {
@@ -174,10 +174,41 @@ void OpenCL::createBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args
     }
 }
 
-void OpenCL::freeBuffers() {
-    for (auto buffer : _buffers) if (buffer) clReleaseMemObject(buffer);
+//~~~~~ Read buffers after kernel execution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void OpenCL::readBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args) 
+{
+    cl_int err;
+    for (int index = 0; index < args.size(); index++)
+    {
+        auto arg = args[index];
+        ArgTypes type = std::get<0>(arg);
+        void* value = std::get<1>(arg);
+        size_t size = std::get<2>(arg);
+
+        switch (type) {
+            case ArgTypes::OUT_IBUF:
+            case ArgTypes::IN_OUT_IBUF:
+                err = clEnqueueReadBuffer(_queue, _buffers[index], CL_TRUE, 0, sizeof(int) * size, value, 0, NULL, NULL);
+                break;
+            case ArgTypes::OUT_FBUF:
+            case ArgTypes::IN_OUT_FBUF:
+                err = clEnqueueReadBuffer(_queue, _buffers[index], CL_TRUE, 0, sizeof(float) * size, value, 0, NULL, NULL);
+                break;
+            default:
+                err = CL_SUCCESS;
+        }
+
+        checkError(err, "clEnqueueReadBuffer");
+    }
 }
 
+//~~~~~ Free OpenCL buffers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void OpenCL::freeBuffers() {
+    for (auto buffer : _buffers) if (buffer) clReleaseMemObject(buffer);
+    _buffers.clear();
+}
 
 //~~~~~ Run OpenCL kernel with given arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -228,35 +259,6 @@ void OpenCL::runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, co
     delete[] workSize;
     if (groupSize) delete[] groupSize;
     checkError(err, "clEnqueueNDRangeKernel");
-}
-
-//~~~~~ Read buffers after kernel execution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-void OpenCL::readBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args) 
-{
-    cl_int err;
-    for (int index = 0; index < args.size(); index++)
-    {
-        auto arg = args[index];
-        ArgTypes type = std::get<0>(arg);
-        void* value = std::get<1>(arg);
-        size_t size = std::get<2>(arg);
-
-        switch (type) {
-            case ArgTypes::OUT_IBUF:
-            case ArgTypes::IN_OUT_IBUF:
-                err = clEnqueueReadBuffer(_queue, _buffers[index], CL_TRUE, 0, sizeof(int) * size, value, 0, NULL, NULL);
-                break;
-            case ArgTypes::OUT_FBUF:
-            case ArgTypes::IN_OUT_FBUF:
-                err = clEnqueueReadBuffer(_queue, _buffers[index], CL_TRUE, 0, sizeof(float) * size, value, 0, NULL, NULL);
-                break;
-            default:
-                err = CL_SUCCESS;
-        }
-
-        checkError(err, "clEnqueueReadBuffer");
-    }
 }
 
 //~~~~~ Execute full job circle: create bufers, run kernel, read results ~~~~~~~~~~~~~~~~~~~~~~~~~~
