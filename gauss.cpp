@@ -7,7 +7,7 @@
 const char* CL_KERNEL_SOURCE = "gauss.cl";
 const char* CL_KERNEL_NAME = "zeroOutCol";
 
-const size_t DIM  = 100;               // 2D square matrix dimension
+const size_t DIM  = 3;               // 2D square matrix dimension
 const size_t SIZE = DIM * (DIM + 1);   // 1D array size for square matrix
 #define ID(r, c) ((r)*(DIM+1)+(c))     // 1D index for 2D matrix
 
@@ -37,11 +37,12 @@ int main()
 
         // Input data
 
-        float *m = new float[SIZE], *result = new float[DIM];
-        for (int i = 0; i < SIZE; i++)
-        {
-            m[i] = (rand() % 2001 - 1000) / 100.0f;
-        }
+        float *m = new float[SIZE]{1, 5, -1, 4, 8, -9, 2, -10, 3, 5, 11, -8},
+        *result = new float[DIM];
+        // for (int i = 0; i < SIZE; i++)
+        // {
+        //     m[i] = (rand() % 2001 - 1000) / 100.0f;
+        // }
 
         printf("\n~~~~~ Let's go with OpenCL\n");
 
@@ -55,20 +56,12 @@ int main()
             {ArgTypes::INT,          (void*)&DIM,   1    },
             {ArgTypes::INT,          (void*)&col,   1    }
         };
-        job.createBuffers(
-            args
-        );
+        job.createBuffers(args);
         for (col = 0; col < DIM; col++)
         {
-            job.runKernel(
-                args,
-                { DIM, DIM+1 },
-                { 1, DIM+1 }
-            );
+            job.runKernel(args, { DIM, DIM+1 }, { 1, DIM+1 });
         }
-        job.readBuffers(
-            args
-        );
+        job.readBuffers(args);
         // job.run(
         //     {
         //         {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
