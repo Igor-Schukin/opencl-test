@@ -9,13 +9,12 @@ __kernel void zeroOutCol(
     const int col
 ) {
     __local float ratio;
-    __local int w;
+    __local int w, d;
 
-    int d = 0;
     int j = get_global_id(0);
     int k = get_local_id(1);
 
-    if ( k == 0) {
+    if (k == 0) {
         d = get_global_size(0);
         w = d + 1;
         ratio = m[j * w + col] / m[col * w + col];
