@@ -18,7 +18,9 @@ void printMatrix(float* matrix)
         for (size_t j = 0; j < DIM + 1; j++)
         {
             if (j >= 10) { printf(" ...."); break; }
-            printf("%10.2f ", matrix[ID(i,j)]);
+            float f = matrix[ID(i,j)];
+            if (fabs(f) > 1E5) printf("%cINF", f < 0 ? '-' : '+');
+            else printf("%10.2f ", f);
         }
         printf("\n");
     }
@@ -59,7 +61,7 @@ int main()
         tsEnd = getTime();
         size_t tsWopenCL = tsEnd - tsStart;
 
-        printMatrix(result);
+        printMatrix(m);
 /*
         printf("\n~~~~~ Let's go without OpenCL\n");
 
