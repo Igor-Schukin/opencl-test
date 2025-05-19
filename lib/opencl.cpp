@@ -123,26 +123,19 @@ void OpenCL::release()
     if (_program)  clReleaseProgram(_program);
     if (_queue)   clReleaseCommandQueue(_queue);
     if (_context) clReleaseContext(_context);
+    freeBuffers();
 }
 
-//~~~~~ Run OpenCL kernel with given arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~ Create and free buffers for kernel arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void OpenCL::run(
-    std::vector<std::tuple<ArgTypes, void*, size_t>> args,
-    const std::vector<size_t>& globalSize,
-    const std::vector<size_t>& localSize
-)
+void OpenCL::createBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args) 
 {
-    std::vector<cl_mem> buffers;
-
     try {
         cl_int err;
-
-        // Create buffers
-
-        cl_mem buffer;
+        freeBuffers();
         for (const auto& arg : args)
         {
+            cl_mem buffer;
             ArgTypes type = std::get<0>(arg);
             void* value = std::get<1>(arg);
             size_t size = std::get<2>(arg);
@@ -171,98 +164,117 @@ void OpenCL::run(
                     buffer = 0;
                     err = CL_SUCCESS;
             }
-/*
-            if (type == ArgTypes::IN_IBUF) buffer = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * size, value, &err);
-            else if (type == ArgTypes::OUT_IBUF) buffer = clCreateBuffer(_context, CL_MEM_WRITE_ONLY, sizeof(int) * size, NULL, &err);
-//          else if (type == ArgTypes::OUT_IBUF) buffer = clCreateBuffer(_context, CL_MEM_READ_WRITE | CL_MEM_HOST_READ_ONLY, sizeof(int) * size, NULL, &err);
-            else { buffer = 0; err = CL_SUCCESS; }
-*/
             checkError(err, "clCreateBuffer");
-            buffers.push_back(buffer);
+            _buffers.push_back(buffer);
         }
-
-        // Set kernel arguments
-
-        for (int index = 0; index < args.size(); index++)
-        {
-            auto arg = args[index];
-            ArgTypes type = std::get<0>(arg);
-            void* value = std::get<1>(arg);
-            size_t size = std::get<2>(arg);
-
-            switch (type)
-            {
-                case ArgTypes::INT:
-                    err = clSetKernelArg(_kernel, index, sizeof(int), value);
-                    break;
-                case ArgTypes::IN_IBUF:
-                case ArgTypes::OUT_IBUF:
-                case ArgTypes::IN_OUT_IBUF:
-                case ArgTypes::IN_FBUF:
-                case ArgTypes::OUT_FBUF:
-                case ArgTypes::IN_OUT_FBUF:
-                    err = clSetKernelArg(_kernel, index, sizeof(cl_mem), &buffers[index]);
-                    break;
-                default:
-                    throw OpenClError("Invalid argument type");
-            }
-            checkError(err, "clSetKernelArg");
-        }
-
-        // Execute kernel
-
-        cl_uint workDim = static_cast<cl_uint>(globalSize.size());
-        size_t *workSize = new size_t[workDim]; 
-        for (cl_uint i = 0; i < workDim; i++) workSize[i] = globalSize[i];
-        size_t *groupSize = NULL;
-        if (!localSize.empty())
-        {
-            groupSize = new size_t[workDim];
-            for (cl_uint i = 0; i < workDim; i++) groupSize[i] = localSize[i];
-        }
-        err = clEnqueueNDRangeKernel(_queue, _kernel, workDim, NULL, workSize, groupSize, 0, NULL, NULL);
-        delete[] workSize;
-        if (groupSize) delete[] groupSize;
-        checkError(err, "clEnqueueNDRangeKernel");
-        
-        // Read result
-
-        for (int index = 0; index < args.size(); index++)
-        {
-            auto arg = args[index];
-            ArgTypes type = std::get<0>(arg);
-            void* value = std::get<1>(arg);
-            size_t size = std::get<2>(arg);
-
-            switch (type) {
-                case ArgTypes::OUT_IBUF:
-                case ArgTypes::IN_OUT_IBUF:
-                    err = clEnqueueReadBuffer(_queue, buffers[index], CL_TRUE, 0, sizeof(int) * size, value, 0, NULL, NULL);
-                    break;
-                case ArgTypes::OUT_FBUF:
-                case ArgTypes::IN_OUT_FBUF:
-                    err = clEnqueueReadBuffer(_queue, buffers[index], CL_TRUE, 0, sizeof(float) * size, value, 0, NULL, NULL);
-                    break;
-                default:
-                    err = CL_SUCCESS;
-            }
-
-            checkError(err, "clEnqueueReadBuffer");
-/*
-            if (type == ArgTypes::OUT_IBUF || type == ArgTypes::IN_OUT_IBUF)
-            {
-                err = clEnqueueReadBuffer(_queue, buffers[index], CL_TRUE, 0, sizeof(int) * size, value, 0, NULL, NULL);
-                checkError(err, "clEnqueueReadBuffer");
-            }
-*/
-        }
-
-        // Free buffers
-        
-        for (auto buffer : buffers) if (buffer) clReleaseMemObject(buffer);
     }
     catch (...) {
-        for (auto buffer : buffers) if (buffer) clReleaseMemObject(buffer);
+        freeBuffers();
+        throw;
+    }
+}
+
+void OpenCL::freeBuffers() {
+    for (auto buffer : _buffers) if (buffer) clReleaseMemObject(buffer);
+}
+
+
+//~~~~~ Run OpenCL kernel with given arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void OpenCL::runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize) 
+{
+    cl_int err;
+
+    // Set kernel arguments
+
+    for (int index = 0; index < args.size(); index++)
+    {
+        auto arg = args[index];
+        ArgTypes type = std::get<0>(arg);
+        void* value = std::get<1>(arg);
+        size_t size = std::get<2>(arg);
+
+        switch (type)
+        {
+            case ArgTypes::INT:
+                err = clSetKernelArg(_kernel, index, sizeof(int), value);
+                break;
+            case ArgTypes::IN_IBUF:
+            case ArgTypes::OUT_IBUF:
+            case ArgTypes::IN_OUT_IBUF:
+            case ArgTypes::IN_FBUF:
+            case ArgTypes::OUT_FBUF:
+            case ArgTypes::IN_OUT_FBUF:
+                err = clSetKernelArg(_kernel, index, sizeof(cl_mem), &_buffers[index]);
+                break;
+            default:
+                throw OpenClError("Invalid argument type");
+        }
+        checkError(err, "clSetKernelArg");
+    }
+
+    // Execute kernel
+
+    cl_uint workDim = static_cast<cl_uint>(globalSize.size());
+    size_t *workSize = new size_t[workDim]; 
+    for (cl_uint i = 0; i < workDim; i++) workSize[i] = globalSize[i];
+    size_t *groupSize = NULL;
+    if (!localSize.empty())
+    {
+        groupSize = new size_t[workDim];
+        for (cl_uint i = 0; i < workDim; i++) groupSize[i] = localSize[i];
+    }
+    err = clEnqueueNDRangeKernel(_queue, _kernel, workDim, NULL, workSize, groupSize, 0, NULL, NULL);
+    delete[] workSize;
+    if (groupSize) delete[] groupSize;
+    checkError(err, "clEnqueueNDRangeKernel");
+}
+
+//~~~~~ Read buffers after kernel execution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void OpenCL::readBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args) 
+{
+    cl_int err;
+    for (int index = 0; index < args.size(); index++)
+    {
+        auto arg = args[index];
+        ArgTypes type = std::get<0>(arg);
+        void* value = std::get<1>(arg);
+        size_t size = std::get<2>(arg);
+
+        switch (type) {
+            case ArgTypes::OUT_IBUF:
+            case ArgTypes::IN_OUT_IBUF:
+                err = clEnqueueReadBuffer(_queue, _buffers[index], CL_TRUE, 0, sizeof(int) * size, value, 0, NULL, NULL);
+                break;
+            case ArgTypes::OUT_FBUF:
+            case ArgTypes::IN_OUT_FBUF:
+                err = clEnqueueReadBuffer(_queue, _buffers[index], CL_TRUE, 0, sizeof(float) * size, value, 0, NULL, NULL);
+                break;
+            default:
+                err = CL_SUCCESS;
+        }
+
+        checkError(err, "clEnqueueReadBuffer");
+    }
+}
+
+//~~~~~ Execute full job circle: create bufers, run kernel, read results ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void OpenCL::run(
+    std::vector<std::tuple<ArgTypes, void*, size_t>> args,
+    const std::vector<size_t>& globalSize,
+    const std::vector<size_t>& localSize
+)
+{
+    try {
+        createBuffers(args);
+        runKernel(args, globalSize, localSize);
+        readBuffers(args);
+        freeBuffers();
+    }
+    catch (...) {
+        freeBuffers();
         throw;
     }
 }

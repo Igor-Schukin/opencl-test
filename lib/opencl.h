@@ -25,6 +25,7 @@ private:
     cl_command_queue _queue = nullptr;
     cl_program _program = nullptr;
     cl_kernel _kernel = nullptr;
+    std::vector<cl_mem> _buffers{};
 
     char* loadKernelSource(const std::string& filename);
     void checkError(cl_int err, const std::string& operation);
@@ -36,6 +37,11 @@ public:
     ~OpenCL();
 
     void run(std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize = {});
+
+    void createBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args);
+    void readBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args);
+    void freeBuffers();
+    void runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize = {});
 };
 
 #endif // OPENCL_H
