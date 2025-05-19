@@ -50,7 +50,7 @@ int main()
         size_t col = 0;
         job.run(
             {
-                {ArgTypes::IN_FBUF,  (void*)m,      SIZE },
+                {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
                 {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
                 {ArgTypes::INT,          (void*)&DIM,   1    },
                 {ArgTypes::INT,          (void*)&col,   1    }
