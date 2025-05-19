@@ -49,7 +49,15 @@ int main()
 
         tsStart = getTime();
         size_t col = 0;
-        job.run(
+        job.createBuffers(
+            {
+                {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
+                {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
+                {ArgTypes::INT,          (void*)&DIM,   1    },
+                {ArgTypes::INT,          (void*)&col,   1    }
+            }
+        );
+        job.runKernel(
             {
                 {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
                 {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
@@ -59,6 +67,24 @@ int main()
             { DIM, DIM+1 },
             { 1, DIM+1 }
         );
+        job.readBuffers(
+            {
+                {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
+                {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
+                {ArgTypes::INT,          (void*)&DIM,   1    },
+                {ArgTypes::INT,          (void*)&col,   1    }
+            }
+        );
+        // job.run(
+        //     {
+        //         {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
+        //         {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
+        //         {ArgTypes::INT,          (void*)&DIM,   1    },
+        //         {ArgTypes::INT,          (void*)&col,   1    }
+        //     },
+        //     { DIM, DIM+1 },
+        //     { 1, DIM+1 }
+        // );
         tsEnd = getTime();
         size_t tsWopenCL = tsEnd - tsStart;
 
