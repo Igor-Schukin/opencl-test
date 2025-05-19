@@ -55,7 +55,6 @@ int main()
             },
             { DIM, DIM+1 },
             { 1, DIM+1 }
-            3
         );
         tsEnd = getTime();
         size_t tsWopenCL = tsEnd - tsStart;
@@ -90,13 +89,13 @@ int main()
         delete [] m;
         delete [] result;
 
-        printf("\n~~~~~ Results comparison\n");
-        if (isEqual) printf("   OpenCL and CPU result are the same\n");
-        else printf("   OpenCL and CPU results differ!\n");
+        // printf("\n~~~~~ Results comparison\n");
+        // if (isEqual) printf("   OpenCL and CPU result are the same\n");
+        // else printf("   OpenCL and CPU results differ!\n");
 
         printf("\n~~~~~ Execution time\n");
         printf("     with OpenCL: %zu ms\n", tsWopenCL);
-        printf("  without OpenCL: %zu ms\n", tsWOopenCL);
+        // printf("  without OpenCL: %zu ms\n", tsWOopenCL);
         printf("\n~~~~~ Bye!\n");
     }
     catch (const OpenClError& e)
