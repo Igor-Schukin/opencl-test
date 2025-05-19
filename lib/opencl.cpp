@@ -126,6 +126,15 @@ void OpenCL::release()
     freeBuffers();
 }
 
+/**************************************************************************************************
+ * OpenCL buffer management
+ *
+ * This section contains functions to create, read, and free OpenCL buffers.
+ * The buffers are created based on the argument types specified in the run method.
+ * The buffers are automatically freed after use.
+ *
+ **************************************************************************************************/
+
 //~~~~~ Create buffers for kernel arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void OpenCL::createBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args) 
@@ -210,7 +219,13 @@ void OpenCL::freeBuffers() {
     _buffers.clear();
 }
 
-//~~~~~ Run OpenCL kernel with given arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/**************************************************************************************************
+ * OpenCL kernel execution
+ *
+ * This section contains functions to run the OpenCL kernel with the specified arguments.
+ * The kernel is executed with the given global and local sizes.
+ *
+ **************************************************************************************************/
 
 void OpenCL::runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize) 
 {
@@ -261,7 +276,14 @@ void OpenCL::runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, co
     checkError(err, "clEnqueueNDRangeKernel");
 }
 
-//~~~~~ Execute full job circle: create bufers, run kernel, read results ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/**************************************************************************************************
+
+* OpenCL run method
+*
+* This method executes the full job circle: create buffers, run kernel, read results.
+* It takes a vector of arguments, global size, and local size as input.
+*
+**************************************************************************************************/
 
 void OpenCL::run(
     std::vector<std::tuple<ArgTypes, void*, size_t>> args,

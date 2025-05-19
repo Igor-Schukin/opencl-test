@@ -4,7 +4,7 @@
 #include "opencl.h"
 
 const char* CL_KERNEL_SOURCE = "gauss.cl";
-const char* CL_KERNEL_NAME = "toTriangular";
+const char* CL_KERNEL_NAME = "zeroOutCol";
 
 const size_t DIM  = 100;               // 2D square matrix dimension
 const size_t SIZE = DIM * (DIM + 1);   // 1D array size for square matrix
@@ -45,14 +45,16 @@ int main()
         OpenCL job(CL_KERNEL_SOURCE, CL_KERNEL_NAME);
 
         tsStart = getTime();
+        size_t col = 0;
         job.run(
             {
-                {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
+                {ArgTypes::IN_FBUF,  (void*)m,      SIZE },
                 {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
-                {ArgTypes::INT,          (void*)&DIM,   1    }
+                {ArgTypes::INT,          (void*)&DIM,   1    },
+                {ArgTypes::INT,          (void*)&col,   1    }
             },
-            { DIM, DIM, DIM+1 },
-            { 1, 1, DIM+1 }
+            { DIM, DIM+1 },
+            { 1, DIM+1 }
             3
         );
         tsEnd = getTime();
