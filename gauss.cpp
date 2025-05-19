@@ -49,31 +49,22 @@ int main()
 
         tsStart = getTime();
         size_t col = 0;
+        auto args = std::vector<std::tuple<ArgTypes, void*, size_t>>{
+            {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
+            {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
+            {ArgTypes::INT,          (void*)&DIM,   1    },
+            {ArgTypes::INT,          (void*)&col,   1    }
+        };
         job.createBuffers(
-            {
-                {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
-                {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
-                {ArgTypes::INT,          (void*)&DIM,   1    },
-                {ArgTypes::INT,          (void*)&col,   1    }
-            }
+            args
         );
         job.runKernel(
-            {
-                {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
-                {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
-                {ArgTypes::INT,          (void*)&DIM,   1    },
-                {ArgTypes::INT,          (void*)&col,   1    }
-            },
+            args,
             { DIM, DIM+1 },
             { 1, DIM+1 }
         );
         job.readBuffers(
-            {
-                {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
-                {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
-                {ArgTypes::INT,          (void*)&DIM,   1    },
-                {ArgTypes::INT,          (void*)&col,   1    }
-            }
+            args
         );
         // job.run(
         //     {
