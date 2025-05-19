@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <cmath>
 #include "opencl.h"
 
 const char* CL_KERNEL_SOURCE = "gauss.cl";
