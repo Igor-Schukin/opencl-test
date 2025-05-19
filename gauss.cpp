@@ -7,7 +7,7 @@
 const char* CL_KERNEL_SOURCE = "gauss.cl";
 const char* CL_KERNEL_NAME = "zeroOutCol";
 
-const size_t DIM  = 100;               // 2D square matrix dimension
+const size_t DIM  = 1000;              // 2D square matrix dimension
 const size_t SIZE = DIM * (DIM + 1);   // 1D array size for square matrix
 #define ID(r, c) ((r)*(DIM+1)+(c))     // 1D index for 2D matrix
 
@@ -51,11 +51,11 @@ int main()
         auto args = std::vector<std::tuple<ArgTypes, void*, size_t>>{
             {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
             {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
-            // {ArgTypes::INT,          (void*)&DIM,   1    },
             {ArgTypes::INT,          (void*)&col,   1    }
         };
         job.createBuffers(args);
-        for (col = 0; col < DIM; col++) job.runKernel(args, { DIM, DIM+1 }, { 1, DIM+1 });
+        for (col = 0; col < DIM; col++) job.runKernel(args, { DIM, DIM+1 }, { 1, DIM+1 }); // forward elimination
+        // backward substitution
         job.readBuffers(args);
 
         tsEnd = getTime();
