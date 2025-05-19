@@ -58,11 +58,14 @@ int main()
         job.createBuffers(
             args
         );
-        job.runKernel(
-            args,
-            { DIM, DIM+1 },
-            { 1, DIM+1 }
-        );
+        for (col = 0; col < DIM; col++)
+        {
+            job.runKernel(
+                args,
+                { DIM, DIM+1 },
+                { 1, DIM+1 }
+            );
+        }
         job.readBuffers(
             args
         );
