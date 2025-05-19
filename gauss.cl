@@ -1,11 +1,10 @@
 // OpenCL kernel for Gaussian elimination
 
-// #pragma OPENCL EXTENSION cl_khr_fp64 : enable
+// #pragma OPENCL EXTENSION cl_khr_fp64 : enable // Uncomment if using printf
 
 __kernel void zeroOutCol(
     __global float *m, 
     __global float *result, 
-    // const int dim,
     const int col
 ) {
     __local float ratio;
@@ -25,7 +24,4 @@ __kernel void zeroOutCol(
         if (k == col) m[j * w + k] = 0;
         else if (k > col && k <= d) m[j * w + k] -= ratio * m[col * w + k];
     }
-    //barrier(CLK_GLOBAL_MEM_FENCE);
-
-    // printf("%d %d %d\n", r, c, k);
 }
