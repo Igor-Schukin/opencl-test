@@ -20,9 +20,20 @@ OpenClError::OpenClError(cl_int err, const std::string& operation)
 OpenClError::OpenClError(const std::string& message)
     : std::runtime_error(message) {}
 
-//~~~~~ Constructor and destructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~ Constructors and destructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OpenCL::OpenCL(const std::string & kernelSourceFile, const std::string & kernelName) 
+{
+    try {
+        init(kernelSourceFile, { kernelName });
+    }
+    catch (...) {
+        release();
+        throw;
+    }
+}
+
+OpenCL:OpenCL(const std::string& kernelSourceFile, const std::vector<const std::string>& kernelNames)
 {
     try {
         init(kernelSourceFile, kernelName);
@@ -32,6 +43,7 @@ OpenCL::OpenCL(const std::string & kernelSourceFile, const std::string & kernelN
         throw;
     }
 }
+
 
 OpenCL::~OpenCL() {
     release();
@@ -73,7 +85,7 @@ void OpenCL::checkError(cl_int err, const std::string& operation)
 
 //~~~~~ Initialize OpenCL context, command queue, program, and kernel ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void OpenCL::init(const std::string & kernelSourceFile, const std::string & kernelName) 
+void OpenCL::init(const std::string & kernelSourceFile, const std::vector<const std::string>& kernelNames) 
 {
     // Get platform
     cl_int err = clGetPlatformIDs(1, &_platform, NULL);
@@ -110,16 +122,22 @@ void OpenCL::init(const std::string & kernelSourceFile, const std::string & kern
         throw OpenClError(errorMsg);
     }
 
-    // Create kernel
-    _kernel = clCreateKernel(_program, kernelName.c_str(), &err);
-    checkError(err, "clCreateKernel");
+    // Create kernels
+
+    for (const auto& kernelName : kernelNames)
+    {
+        cl_kernel kernel = clCreateKernel(_program, kernelName.c_str(), &err);
+        checkError(err, "clCreateKernel");
+        _kernels.push_back(kernel);
+    }
 }
 
 //~~~~~ Release OpenCL resources ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void OpenCL::release() 
 {
-    if (_kernel)  clReleaseKernel(_kernel);
+    for (const auto kernel& : _kernels) clReleaseKernel(kernel);
+    _kernels.clear();
     if (_program)  clReleaseProgram(_program);
     if (_queue)   clReleaseCommandQueue(_queue);
     if (_context) clReleaseContext(_context);
@@ -227,9 +245,11 @@ void OpenCL::freeBuffers() {
  *
  **************************************************************************************************/
 
-void OpenCL::runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize) 
+void OpenCL::runKernel(int idKkernel, std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize) 
 {
     cl_int err;
+    cl_kernel kernel = _kernels[idKkernel];
+    if (!kernel) throw OpenClError("Kernel not found");
 
     // Set kernel arguments
 
@@ -243,7 +263,7 @@ void OpenCL::runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, co
         switch (type)
         {
             case ArgTypes::INT:
-                err = clSetKernelArg(_kernel, index, sizeof(int), value);
+                err = clSetKernelArg(kernel, index, sizeof(int), value);
                 break;
             case ArgTypes::IN_IBUF:
             case ArgTypes::OUT_IBUF:
@@ -251,7 +271,7 @@ void OpenCL::runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, co
             case ArgTypes::IN_FBUF:
             case ArgTypes::OUT_FBUF:
             case ArgTypes::IN_OUT_FBUF:
-                err = clSetKernelArg(_kernel, index, sizeof(cl_mem), &_buffers[index]);
+                err = clSetKernelArg(kernel, index, sizeof(cl_mem), &_buffers[index]);
                 break;
             default:
                 throw OpenClError("Invalid argument type");
@@ -270,7 +290,7 @@ void OpenCL::runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, co
         groupSize = new size_t[workDim];
         for (cl_uint i = 0; i < workDim; i++) groupSize[i] = localSize[i];
     }
-    err = clEnqueueNDRangeKernel(_queue, _kernel, workDim, NULL, workSize, groupSize, 0, NULL, NULL);
+    err = clEnqueueNDRangeKernel(_queue, kernel, workDim, NULL, workSize, groupSize, 0, NULL, NULL);
     delete[] workSize;
     if (groupSize) delete[] groupSize;
     checkError(err, "clEnqueueNDRangeKernel");
@@ -293,7 +313,7 @@ void OpenCL::run(
 {
     try {
         createBuffers(args);
-        runKernel(args, globalSize, localSize);
+        for (int k = 0; k < _kernels.size(); k++) runKernel(k, args, globalSize, localSize);
         readBuffers(args);
         freeBuffers();
     }

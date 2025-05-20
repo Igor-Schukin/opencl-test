@@ -54,7 +54,7 @@ int main()
             {ArgTypes::INT,          (void*)&col,   1    }
         };
         job.createBuffers(args);
-        for (col = 0; col < DIM; col++) job.runKernel(args, { DIM, DIM+1 }, { 1, DIM+1 }); // forward elimination
+        for (col = 0; col < DIM; col++) job.runKernel(0, args, { DIM, DIM+1 }, { 1, DIM+1 }); // forward elimination
         // backward substitution
         job.readBuffers(args);
 

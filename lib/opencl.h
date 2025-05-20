@@ -24,16 +24,17 @@ private:
     cl_context _context = nullptr;
     cl_command_queue _queue = nullptr;
     cl_program _program = nullptr;
-    cl_kernel _kernel = nullptr;
+    std::vector<cl_kernel> _kernels{};
     std::vector<cl_mem> _buffers{};
 
     char* loadKernelSource(const std::string& filename);
     void checkError(cl_int err, const std::string& operation);
-    void init(const std::string& kernelSourceFile, const std::string& kernelName);
+    void init(const std::string& kernelSourceFile, const std::vector<const std::string>& kernelNames);
     void release();
 
 public:
     OpenCL(const std::string& kernelSourceFile, const std::string& kernelName);
+    OpenCL(const std::string& kernelSourceFile, const std::vector<const std::string>& kernelNames);
     ~OpenCL();
 
     void run(std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize = {});
@@ -41,7 +42,7 @@ public:
     void createBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args);
     void readBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args);
     void freeBuffers();
-    void runKernel(std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize = {});
+    void runKernel(int idKkernel, std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize = {});
 };
 
 #endif // OPENCL_H
