@@ -136,7 +136,7 @@ void OpenCL::init(const std::string & kernelSourceFile, const std::vector<const 
 
 void OpenCL::release() 
 {
-    for (const auto kernel& : _kernels) clReleaseKernel(kernel);
+    for (const auto &kernel : _kernels) clReleaseKernel(kernel);
     _kernels.clear();
     if (_program)  clReleaseProgram(_program);
     if (_queue)   clReleaseCommandQueue(_queue);
