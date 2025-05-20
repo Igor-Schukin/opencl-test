@@ -42,12 +42,12 @@ __kernel void calcRoot(
     if (j == 0) {
         d = get_global_size(0);
         w = d + 1;
+        result[row] = m[row * w + d];
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     if (j >= row + 1 && j < d) {
-        float d = m[row * w + j] * result[j];
-        atomic_sub(&result[row], d);
+        result[row] -= m[row * w + j] * result[j];
     }
     barrier(CLK_GLOBAL_MEM_FENCE);
 

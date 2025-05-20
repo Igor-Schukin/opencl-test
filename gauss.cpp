@@ -28,6 +28,18 @@ void printMatrix(float* matrix)
     }
 }
 
+void prinVector(float* vector)
+{
+    for (size_t i = 0; i < DIM; i++)
+    {
+        if (i >= 10) { printf("...."); break; }
+        float f = vector[i];
+        if (fabs(f) > 1E5) printf("%cINF", f < 0 ? '-' : '+');
+        else printf("%10.2f ", f);
+    }
+    printf("\n");
+}
+
 int main()
 {
     try { 
@@ -62,7 +74,7 @@ int main()
         tsEnd = getTime();
         size_t tsWopenCL = tsEnd - tsStart;
 
-        printMatrix(m);
+        printVector(result);
 /*
         printf("\n~~~~~ Let's go without OpenCL\n");
 
