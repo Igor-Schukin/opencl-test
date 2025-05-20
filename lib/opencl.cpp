@@ -22,7 +22,7 @@ OpenClError::OpenClError(const std::string& message)
 
 //~~~~~ Constructors and destructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-OpenCL::OpenCL(const std::string & kernelSourceFile, const std::string & kernelName) 
+OpenCL::OpenCL(const std::string & kernelSourceFile, std::string & kernelName) 
 {
     try {
         init(kernelSourceFile, { kernelName });
@@ -33,7 +33,7 @@ OpenCL::OpenCL(const std::string & kernelSourceFile, const std::string & kernelN
     }
 }
 
-OpenCL::OpenCL(const std::string& kernelSourceFile, const std::vector<const std::string>& kernelNames)
+OpenCL::OpenCL(const std::string& kernelSourceFile, const std::vector<std::string>& kernelNames)
 {
     try {
         init(kernelSourceFile, kernelNames);
@@ -85,7 +85,7 @@ void OpenCL::checkError(cl_int err, const std::string& operation)
 
 //~~~~~ Initialize OpenCL context, command queue, program, and kernel ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void OpenCL::init(const std::string & kernelSourceFile, const std::vector<const std::string>& kernelNames) 
+void OpenCL::init(const std::string & kernelSourceFile, const std::vector<std::string>& kernelNames) 
 {
     // Get platform
     cl_int err = clGetPlatformIDs(1, &_platform, NULL);

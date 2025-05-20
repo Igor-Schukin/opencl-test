@@ -29,12 +29,12 @@ private:
 
     char* loadKernelSource(const std::string& filename);
     void checkError(cl_int err, const std::string& operation);
-    void init(const std::string& kernelSourceFile, const std::vector<const std::string>& kernelNames);
+    void init(const std::string& kernelSourceFile, const std::vector<std::string>& kernelNames);
     void release();
 
 public:
-    OpenCL(const std::string& kernelSourceFile, const std::string& kernelName);
-    OpenCL(const std::string& kernelSourceFile, const std::vector<const std::string>& kernelNames);
+    OpenCL(const std::string& kernelSourceFile, std::string& kernelName);
+    OpenCL(const std::string& kernelSourceFile, const std::vector<std::string>& kernelNames);
     ~OpenCL();
 
     void run(std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize = {});
