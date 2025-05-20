@@ -36,7 +36,7 @@ OpenCL::OpenCL(const std::string & kernelSourceFile, const std::string & kernelN
 OpenCL:OpenCL(const std::string& kernelSourceFile, const std::vector<const std::string>& kernelNames)
 {
     try {
-        init(kernelSourceFile, kernelName);
+        init(kernelSourceFile, kernelNames);
     }
     catch (...) {
         release();
