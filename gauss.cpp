@@ -45,7 +45,7 @@ int main()
 
         printf("\n~~~~~ Let's go with OpenCL\n");
 
-        OpenCL job(CL_KERNEL_SOURCE, { CL_KERNEL_FW, CL_KERNEL_BW });
+        OpenCL job(CL_KERNEL_SOURCE, std::vector<std::string>{ CL_KERNEL_FW, CL_KERNEL_BW });
 
         tsStart = getTime();
         size_t col = 0;
@@ -56,7 +56,7 @@ int main()
         };
         job.createBuffers(args);
         for (col = 0; col < DIM; col++) job.runKernel(0, args, { DIM, DIM+1 }, { 1, DIM+1 }); // forward elimination
-        // backward substitution
+        for (col = DIM-1; col >= 0; col--) job.runKernel(1, args, { DIM }, { DIM } ); // backward substitution
         job.readBuffers(args);
 
         tsEnd = getTime();

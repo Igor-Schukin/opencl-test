@@ -2,6 +2,8 @@
 
 // #pragma OPENCL EXTENSION cl_khr_fp64 : enable // Uncomment if using printf
 
+// One step of forward elimination
+
 __kernel void zeroOutCol(
     __global float *m, 
     __global float *result, 
@@ -26,27 +28,28 @@ __kernel void zeroOutCol(
     }
 }
 
+// One step of backward substitution
+
 __kernel void calcRoot(
     __global float *m, 
     __global float *result, 
     const int row
 ){
-    __local float ratio;
     __local int w, d;
 
     int j = get_global_id(0);
-    int k = get_local_id(1);
 
-    if (k == 0) {
+    if (j == 0) {
         d = get_global_size(0);
         w = d + 1;
-        ratio = m[row * w + row];
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    if (j == row) {
-        for (int i = 0; i < d; i++) {
-            result[i] = m[i * w + row] / ratio;
-        }
+    if (j >= row + 1 && j < d) {
+        float d = m[row * w + j] * result[j];
+        atomic_sub(&result[row], d);
     }
+    barrier(CLK_GLOBAL_MEM_FENCE);
+
+    if (j == 0) result[row] /= m[row * w + row];
 }
