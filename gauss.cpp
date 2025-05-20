@@ -49,7 +49,7 @@ int main()
         tsStart = getTime();
         size_t col = 0;
         auto args = std::vector<std::tuple<ArgTypes, void*, size_t>>{
-            {ArgTypes::IN_OUT_FBUF,  (void*)m,      SIZE },
+            {ArgTypes::IN_FBUF,      (void*)m,      SIZE },
             {ArgTypes::OUT_FBUF,     (void*)result, DIM  },
             {ArgTypes::INT,          (void*)&col,   1    }
         };
