@@ -25,3 +25,28 @@ __kernel void zeroOutCol(
         else if (k > col && k <= d) m[j * w + k] -= ratio * m[col * w + k];
     }
 }
+
+__kernel void calcRoot(
+    __global float *m, 
+    __global float *result, 
+    const int row
+){
+    __local float ratio;
+    __local int w, d;
+
+    int j = get_global_id(0);
+    int k = get_local_id(1);
+
+    if (k == 0) {
+        d = get_global_size(0);
+        w = d + 1;
+        ratio = m[row * w + row];
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    if (j == row) {
+        for (int i = 0; i < d; i++) {
+            result[i] = m[i * w + row] / ratio;
+        }
+    }
+}

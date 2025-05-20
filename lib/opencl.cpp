@@ -22,7 +22,7 @@ OpenClError::OpenClError(const std::string& message)
 
 //~~~~~ Constructors and destructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-OpenCL::OpenCL(const std::string & kernelSourceFile, std::string & kernelName) 
+OpenCL::OpenCL(const std::string & kernelSourceFile, const std::string & kernelName) 
 {
     try {
         init(kernelSourceFile, { kernelName });

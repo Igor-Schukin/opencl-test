@@ -5,7 +5,8 @@
 #include "opencl.h"
 
 const char* CL_KERNEL_SOURCE = "gauss.cl";
-const char* CL_KERNEL_NAME = "zeroOutCol";
+const char* CL_KERNEL_FW    = "zeroOutCol";
+const char* CL_KERNEL_BW    = "calcRoot";
 
 const size_t DIM  = 1000;              // 2D square matrix dimension
 const size_t SIZE = DIM * (DIM + 1);   // 1D array size for square matrix
@@ -44,7 +45,7 @@ int main()
 
         printf("\n~~~~~ Let's go with OpenCL\n");
 
-        OpenCL job(CL_KERNEL_SOURCE, CL_KERNEL_NAME);
+        OpenCL job(CL_KERNEL_SOURCE, { CL_KERNEL_FW, CL_KERNEL_BW });
 
         tsStart = getTime();
         size_t col = 0;

@@ -33,7 +33,7 @@ private:
     void release();
 
 public:
-    OpenCL(const std::string& kernelSourceFile, std::string& kernelName);
+    OpenCL(const std::string& kernelSourceFile, const std::string& kernelName);
     OpenCL(const std::string& kernelSourceFile, const std::vector<std::string>& kernelNames);
     ~OpenCL();
 
