@@ -28,7 +28,7 @@ void printMatrix(float* matrix)
     }
 }
 
-void prinVector(float* vector)
+void printVector(float* vector)
 {
     for (size_t i = 0; i < DIM; i++)
     {
