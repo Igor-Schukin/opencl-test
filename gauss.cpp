@@ -50,10 +50,10 @@ int main()
 
         // Input data
 
-        // float *m = new float[SIZE]{1, 5, -1, 4, 8, -9, 2, -10, 3, 5, 11, -8}, *result = new float[DIM];
+        float *m = new float[SIZE]{1, 5, -1, 4, 8, -9, 2, -10, 3, 5, 11, -8}, *result = new float[DIM];
 
-        float *m = new float[SIZE], *result = new float[DIM];
-        for (int i = 0; i < SIZE; i++) m[i] = (rand() % 2001 - 1000) / 100.0f;
+        // float *m = new float[SIZE], *result = new float[DIM];
+        // for (int i = 0; i < SIZE; i++) m[i] = (rand() % 2001 - 1000) / 100.0f;
 
         printf("\n~~~~~ Let's go with OpenCL\n");
 

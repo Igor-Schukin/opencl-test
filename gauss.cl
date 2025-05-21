@@ -69,7 +69,7 @@ __kernel void calcRoot(
         d = get_global_size(0);
         w = d + 1;
         r = m[row * w + d] / m[row * w + row];
-        result[col] = r;
+        result[row] = r;
     }
     
     barrier(CLK_LOCAL_MEM_FENCE);
@@ -81,7 +81,7 @@ __kernel void calcRoot(
 }
 
 // Checking the results
-
+/*
 __kernel void calcError(
     __global float *m, 
     __global float *roots,
@@ -106,3 +106,4 @@ __kernel void calcError(
     }
 
 }
+*/
