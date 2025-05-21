@@ -7,6 +7,7 @@
 __kernel void zeroOutCol(
     __global float *m, 
     __global float *result, 
+    __global float *errors, 
     const int col
 ) {
     __local float ratio;
@@ -29,35 +30,11 @@ __kernel void zeroOutCol(
 }
 
 // One step of backward substitution
-/*
+
 __kernel void calcRoot(
     __global float *m, 
     __global float *result, 
-    const int row
-){
-    __local int w, d;
-    __local float r;
-
-    int j = get_global_id(0);
-
-    if (j == 0) {
-        d = get_global_size(0);
-        w = d + 1;
-        r = m[row * w + d];
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    if (j >= row + 1 && j < d) {
-        r -= m[row * w + j] * result[j];
-    }
-    barrier(CLK_GLOBAL_MEM_FENCE);
-
-    if (j == 0) result[row] = r / m[row * w + row];
-}
-*/
-__kernel void calcRoot(
-    __global float *m, 
-    __global float *result, 
+    __global float *errors, 
     const int col
 ){
     __local int w, d;
@@ -77,33 +54,30 @@ __kernel void calcRoot(
     if (row < col) {
         m[row * w + d] -= m[row * w + col] * r;
     }
-
 }
 
-// Checking the results
-/*
+// Calculate the error for each row
+
 __kernel void calcError(
     __global float *m, 
-    __global float *roots,
-    float error
+    __global float *result,
+    __global float *errors, 
+    const int col
 ){
+
     __local int w, d;
     __local float r;
 
     int row = get_local_id(0);
 
-    if (row == col) {
+    if (row == 0) {
         d = get_global_size(0);
         w = d + 1;
-        r = m[row * w + d] / m[row * w + row];
-        result[col] = r;
+        r = result[col];
+        errors[row] = m[row * w + d];
     }
     
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    if (row < col) {
-        m[row * w + d] -= m[row * w + col] * r;
-    }
-
+    errors[row] -= m[row * w + col] * r;
 }
-*/
