@@ -201,6 +201,13 @@ void OpenCL::createBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args
     }
 }
 
+void  OpenCL::writeBuffer(int bufId, void* data, size_t size)
+{
+    cl_int err = clEnqueueWriteBuffer(_queue, _buffers[bufId], CL_TRUE,  0, size, data, 0, NULL, NULL);
+    checkError(err, "clCreateBuffer");
+}
+
+
 //~~~~~ Read buffers after kernel execution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void OpenCL::readBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args) 
