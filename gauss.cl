@@ -1,6 +1,6 @@
 // OpenCL kernel for Gaussian elimination
 
-// #pragma OPENCL EXTENSION cl_khr_fp64 : enable // Uncomment if using printf
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable // Uncomment if using printf
 
 // One step of forward elimination
 
@@ -74,10 +74,12 @@ __kernel void calcError(
         d = get_global_size(0);
         w = d + 1;
         r = result[col];
-        errors[row] = m[row * w + d];
     }
+    if (col == 0) errors[row] = m[row * w + d];
     
     barrier(CLK_LOCAL_MEM_FENCE);
 
     errors[row] -= m[row * w + col] * r;
+    
+    printf("col = %d, row - %d, err = %f\n", col, row, errors[row]);
 }
