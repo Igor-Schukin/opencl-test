@@ -89,7 +89,7 @@ int main()
 
         //~~~ matrix copy for final test
 
-        float *mc = new float[SIZE]
+        float *mc = new float[SIZE];
         for(int i = 0; i < SIZE; i++) mc[i] = m[i];
         
         tsStart = getTime();
@@ -124,7 +124,7 @@ int main()
         }
 
         tsEnd = getTime();
-        size_t tsWopenCL = tsEnd - tsStart;
+        size_t tsWOopenCL = tsEnd - tsStart;
 
         printVector(result);
         printf("\nError: %f\n", err);
