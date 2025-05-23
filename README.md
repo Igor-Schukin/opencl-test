@@ -58,4 +58,12 @@ The project includes the following examples of OpenCL usage for data processing:
    - the matrices are filled with random integers in the range from -100 to +100;  
    - the product is calculated using both the OpenCL kernel and CPU loops;  
    - the results of the OpenCL kernel and CPU calculations are compared;  
-   - for verification, parts of the resulting matrices of size 10x10 are displayed on the screen.
+   - for verification, parts of the resulting matrices of size 10x10 are displayed on the screen;
+   - the times required for computation using the GPU and the CPU are measured.
+1. ***gauss*** - an example of parallel calculation of roots of a system of linear equations by the Gauss elimination method:
+   - the matrix dimensions are 1000x1000;  
+   - the matrix is filled with random real values in the range from -10 to +10;  
+   - the roots are calculated using both the OpenCL kernel and CPU loops;  
+   - the results of the OpenCL kernel and CPU loops are checked by substituting the found roots into the original matrix;
+   - for verification, the first 10 roots are displayed on the screen;
+   - the times required for computation using the GPU and the CPU are measured.

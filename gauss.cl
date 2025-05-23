@@ -80,6 +80,4 @@ __kernel void calcError(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     errors[row] -= m[row * w + col] * r;
-    
-    // printf("col = %d, row - %d, err = %f\n", col, row, errors[row]);
 }

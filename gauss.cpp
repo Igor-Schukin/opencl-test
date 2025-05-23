@@ -9,7 +9,7 @@ const char* CL_KERNEL_FW    = "zeroOutCol";
 const char* CL_KERNEL_BW    = "calcRoot";
 const char* CL_KERNEL_CHECK = "calcError";
 
-const size_t DIM  = 3;              // 2D square matrix dimension
+const size_t DIM  = 1000;              // 2D square matrix dimension
 const size_t SIZE = DIM * (DIM + 1);   // 1D array size for 2D extended matrix
 #define ID(r, c) ((r)*(DIM+1)+(c))     // 1D index for 2D extended matrix
 
@@ -53,10 +53,10 @@ int main()
 
         // Input data
 
-        float *m = new float[SIZE]{1, 5, -1, 4, 8, -9, 2, -10, 3, 5, 11, -8}, *result = new float[DIM], *errors = new float[DIM];
+        // float *m = new float[SIZE]{1, 5, -1, 4, 8, -9, 2, -10, 3, 5, 11, -8}, *result = new float[DIM], *errors = new float[DIM];  // test data
 
-        // float *m = new float[SIZE], *result = new float[DIM], *errors = new float[DIM];
-        // for (int i = 0; i < SIZE; i++) m[i] = (rand() % 2001 - 1000) / 100.0f;
+        float *m = new float[SIZE], *result = new float[DIM], *errors = new float[DIM];
+        for (int i = 0; i < SIZE; i++) m[i] = (rand() % 2001 - 1000) / 100.0f;
 
         printf("\n~~~~~ Let's go with OpenCL\n");
 
@@ -73,7 +73,7 @@ int main()
         job.createBuffers(args);
         for (col = 0; col < DIM; col++) job.runKernel(0, args, { DIM, DIM+1 }, { 1, DIM+1 });   // forward elimination
         for (col = DIM-1; col >= 0; col--) job.runKernel(1, args, { DIM }, { DIM } );           // backward substitution
-        job.writeBuffers(args);                                                                 // write back the matrix
+        job.writeBuffers(args);                                                                 // write back the original matrix
         for (col = 0; col < DIM; col++) job.runKernel(2, args, { DIM }, { DIM } );              // check errors
         job.readBuffers(args);
 
