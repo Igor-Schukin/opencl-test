@@ -201,12 +201,32 @@ void OpenCL::createBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args
     }
 }
 
-void  OpenCL::writeBuffer(int bufId, void* data, size_t size)
-{
-    cl_int err = clEnqueueWriteBuffer(_queue, _buffers[bufId], CL_TRUE,  0, size, data, 0, NULL, NULL);
-    checkError(err, "clCreateBuffer");
-}
+//~~~~~ Write buffer to OpenCL device ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+void  OpenCL::writeBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args)
+{
+    cl_int err;
+    for (int index = 0; index < args.size(); index++)
+    {
+        auto arg = args[index];
+        ArgTypes type = std::get<0>(arg);
+        void* value = std::get<1>(arg);
+        size_t size = std::get<2>(arg);
+
+        switch (type) {
+            case ArgTypes::IN_IBUF:
+                err = clEnqueueWriteBuffer(_queue, _buffers[index], CL_TRUE, 0, sizeof(int) * size, value, 0, NULL, NULL);
+                break;
+            case ArgTypes::IN_FBUF:
+                err = clEnqueueWriteBuffer(_queue, _buffers[index], CL_TRUE, 0, sizeof(float) * size, value, 0, NULL, NULL);
+                break;
+            default:
+                err = CL_SUCCESS;
+        }
+
+        checkError(err, "clEnqueueReadBuffer");
+    }
+}
 
 //~~~~~ Read buffers after kernel execution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

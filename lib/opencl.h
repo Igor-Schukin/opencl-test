@@ -41,7 +41,7 @@ public:
 
     void createBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args);
     void readBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args);
-    void writeBuffer(int bufId, void* data, size_t size);
+    void writeBuffers(std::vector<std::tuple<ArgTypes, void*, size_t>> args);
     void freeBuffers();
     void runKernel(int idKkernel, std::vector<std::tuple<ArgTypes, void*, size_t>> args, const std::vector<size_t>& globalSize, const std::vector<size_t>& localSize = {});
 };

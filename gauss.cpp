@@ -73,7 +73,7 @@ int main()
         job.createBuffers(args);
         for (col = 0; col < DIM; col++) job.runKernel(0, args, { DIM, DIM+1 }, { 1, DIM+1 });   // forward elimination
         for (col = DIM-1; col >= 0; col--) job.runKernel(1, args, { DIM }, { DIM } );           // backward substitution
-        job.writeBuffer(0, (void*)m, SIZE);                                                     // write back the matrix
+        job.writeBuffers(args);                                                                 // write back the matrix
         for (col = 0; col < DIM; col++) job.runKernel(2, args, { DIM }, { DIM } );              // check errors
         job.readBuffers(args);
 
