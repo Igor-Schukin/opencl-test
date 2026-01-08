@@ -22,7 +22,7 @@ int main() {
         char platform_profile[128]{};
         char platform_vendor[128]{};
         char platform_version[128]{};
-        char platform_extensions[512]{};
+        char platform_extensions[1024]{};
         
         err = clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, sizeof(platform_name), platform_name, NULL);
         clGetPlatformInfo(platforms[i], CL_PLATFORM_PROFILE, sizeof(platform_profile), platform_profile, NULL);
@@ -30,7 +30,6 @@ int main() {
         clGetPlatformInfo(platforms[i], CL_PLATFORM_VERSION, sizeof(platform_version), platform_version, NULL);
         clGetPlatformInfo(platforms[i], CL_PLATFORM_EXTENSIONS, sizeof(platform_extensions), platform_extensions, NULL);
 
-        std::cout << "Result/Error Cl.GetPlatformInfo: " << err << std::endl;
         std::cout << "Platform Name: " << platform_name << std::endl;
         std::cout << "Platform Profile: " << platform_profile << std::endl;
         std::cout << "Platform Vendor: " << platform_vendor << std::endl;
