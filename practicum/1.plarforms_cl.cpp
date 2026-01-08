@@ -18,11 +18,11 @@ int main() {
 
     // Iterate over each platform and get info
     for (cl_uint i = 0; i < num_platforms; i++) {
-        char platform_name[128];
-        char platform_profile[128];
-        char platform_vendor[128];
-        char platform_version[128];
-        char platform_extensions[512];
+        char platform_name[128]{};
+        char platform_profile[128]{};
+        char platform_vendor[128]{};
+        char platform_version[128]{};
+        char platform_extensions[512]{};
         
         err = clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, sizeof(platform_name), platform_name, NULL);
         clGetPlatformInfo(platforms[i], CL_PLATFORM_PROFILE, sizeof(platform_profile), platform_profile, NULL);
