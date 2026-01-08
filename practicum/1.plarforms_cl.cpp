@@ -1,35 +1,6 @@
 #include <iostream>
 #include <CL/cl.h>
 
-/*
-            ErrorCode error = Cl.GetPlatformIDs(0, null, out platformCount);
-
-            richTextBox1.AppendText("Platforms Count: " + platformCount + "\r\n");
-            richTextBox1.AppendText("Result/Error 1. Cl.GetPlatformIDs: " + error.ToString() + "\r\n");
-            platforms = Cl.GetPlatformIDs(out error);
-     
-            richTextBox1.AppendText("Result/Error 2. Cl.GetPlatformIDs: " + error.ToString() + "\r\n");
-            richTextBox1.AppendText("------------------------------------\r\n");
-
-            // get all platforms
-            foreach (OpenCL.Net.Platform platform in platforms)
-            {
-                string platformName = Cl.GetPlatformInfo(platform, PlatformInfo.Name, out error).ToString();
-                string platformProfile = Cl.GetPlatformInfo(platform, PlatformInfo.Profile, out error).ToString();
-                string platformVendor = Cl.GetPlatformInfo(platform, PlatformInfo.Vendor, out error).ToString();
-                string platformVersion = Cl.GetPlatformInfo(platform, PlatformInfo.Version, out error).ToString();
-                string platformExtensions = Cl.GetPlatformInfo(platform, PlatformInfo.Extensions, out error).ToString();
-
-                richTextBox1.AppendText("Result/Error Cl.GetPlatformInfo: " + error.ToString() + "\r\n");
-                richTextBox1.AppendText("Platform_Name: " + platformName + "\r\n");
-                richTextBox1.AppendText("Platform_Profile: " + platformProfile + "\r\n");
-                richTextBox1.AppendText("Platform_Vendor: " + platformVendor + "\r\n");
-                richTextBox1.AppendText("Platform_Version: " + platformVersion + "\r\n");
-                // richTextBox1.AppendText("Platform_Extensions: " + platformExtensions + "\r\n");
-                richTextBox1.AppendText("------------------------------------\r\n");
-            }
-*/
-
 int main() {
     cl_int err;
     cl_uint num_platforms;
@@ -66,10 +37,6 @@ int main() {
         std::cout << "Platform Version: " << platform_version << std::endl;
         std::cout << "Platform Extensions: " << platform_extensions << std::endl;
         std::cout << "------------------------------------" << std::endl;
-
-        std::cout << "\nPlatform " << i + 1 << ":" << std::endl;
-        std::cout << "Name: " << platform_name << std::endl;
-        std::cout << "Manufacturer: " << platform_vendor << std::endl;
     }
 
     delete[] platforms;
