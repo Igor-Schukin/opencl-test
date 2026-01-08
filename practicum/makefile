@@ -1,2 +1,2 @@
 %: %.cpp
-	g++ -std=c++17 $< -I/usr/include/CL -L/usr/lib -lOpenCL -o $@
+	g++ -std=c++11 $< -I/usr/include/CL -L/usr/lib -lOpenCL -o $@
