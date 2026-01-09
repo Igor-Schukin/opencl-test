@@ -2,7 +2,7 @@
 #include <CL/cl.h>
 
 // Initialize OpenCL and get the first available device ID
-cl_device_id clInit() throw (std::runtime_error) {
+cl_device_id clInit() {
     cl_int error;
     cl_uint numPlatforms;
     cl_platform_id* platforms = nullptr;
