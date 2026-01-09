@@ -57,6 +57,7 @@ int main() {
                 error = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, numDevices, devices, NULL);
                 if (error != CL_SUCCESS) throw std::runtime_error("Failed to get device IDs");
 
+                // Iterate over each device and get info
                 for (cl_uint j = 0; j < numDevices; j++) {
                     std::cout << "------------------------------------" << std::endl;
 
