@@ -10,13 +10,11 @@ int main() {
         // Get platform count
         error = clGetPlatformIDs(0, NULL, &numPlatforms);
         std::cout << "Platforms Count: " << numPlatforms << std::endl;
-        std::cout << "Result/Error 1. Cl.GetPlatformIDs: " << error << std::endl;
         if (error != CL_SUCCESS || numPlatforms == 0) throw std::runtime_error("No platforms found or error occurred");
 
         // Get all platforms
         platforms = new cl_platform_id[numPlatforms];
         error = clGetPlatformIDs(numPlatforms, platforms, NULL);
-        std::cout << "Result/Error 2. Cl.GetPlatformIDs: " << error << std::endl;
         if (error != CL_SUCCESS) throw std::runtime_error("Failed to get platform IDs");
         std::cout << "------------------------------------" << std::endl;
 
