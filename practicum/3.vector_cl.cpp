@@ -87,7 +87,7 @@ int main() {
         context = clCreateContext(NULL, 1, &device, NULL, NULL, &error);
         if (error != CL_SUCCESS) throw std::runtime_error("failed to create OpenCL context");
 
-        queue = clCreateCommandQueue(context, device, 0, &error);
+        queue = clCreateCommandQueueWithProperties(context, device, NULL, &error);
         if (error != CL_SUCCESS) throw std::runtime_error("failed to create command queue");
 
         program = clCreateProgramWithSource(context, 1, &vectorAddKernelSource, NULL, &error);
