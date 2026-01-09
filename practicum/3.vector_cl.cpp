@@ -64,26 +64,31 @@ const char* vectorAddKernelSource = R"(
 
 int main() {
 
-    // Create float arrays A, B, C and initialize A and B with random values in range 0..10
+    // Host arrays
     const int arraySize = 1024;
-    float* arrayA = new float[arraySize];
-    float* arrayB = new float[arraySize];
-    float* arrayC = new float[arraySize];
+    float* arrayA = new float[arraySize]; // Input array A
+    float* arrayB = new float[arraySize]; // Input array B
+    float* arrayC = new float[arraySize]; // Output array C
+
+    // Initialize input arrays with random values in range [0, 10]
+    srand(static_cast<unsigned int>(time(0)));
     for (int i = 0; i < arraySize; i++) {
-        arrayA[i] = static_cast<float>(rand() % 11);
-        arrayB[i] = static_cast<float>(rand() % 11);
+        arrayA[i] = rand() % 1000 / 100.0f;
+        arrayB[i] = rand() % 1000 / 100.0f;
     }
+
+    // OpenCL resources
+    cl_context context = nullptr;
+    cl_command_queue queue = nullptr;
+    cl_program program = nullptr;
+    cl_kernel kernel = nullptr;
+    cl_mem bufferA = nullptr;
+    cl_mem bufferB = nullptr;
+    cl_mem bufferC = nullptr;
 
     try {
         cl_device_id device = clInit();
         cl_int error;
-        cl_context context = nullptr;
-        cl_command_queue queue = nullptr;
-        cl_program program = nullptr;
-        cl_kernel kernel = nullptr;
-        cl_mem bufferA = nullptr;
-        cl_mem bufferB = nullptr;
-        cl_mem bufferC = nullptr;
 
         // Prepare OpenCL context, command queue, program and kernel
         context = clCreateContext(NULL, 1, &device, NULL, NULL, &error);
@@ -136,14 +141,11 @@ int main() {
         }
         std::cout << "Vector addition successful and verified!" << std::endl;
 
-        // Clean up OpenCL resources
-        if (bufferA) clReleaseMemObject(bufferA);
-        if (bufferB) clReleaseMemObject(bufferB);
-        if (bufferC) clReleaseMemObject(bufferC);
-        if (kernel) clReleaseKernel(kernel);
-        if (program) clReleaseProgram(program);
-        if (queue) clReleaseCommandQueue(queue);
-        if (context) clReleaseContext(context);
+        //Show first 10 results
+        std::cout << "First 10 results of vector addition:" << std::endl;
+        for (int i = 0; i < 10; i++) {
+            std::cout << arrayA[i] << " + " << arrayB[i] << " = " << arrayC[i] << std::endl;
+        }
 
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
@@ -151,10 +153,18 @@ int main() {
         std::cerr << "An unknown error occurred." << std::endl;
     }
 
+    // Clean up OpenCL resources in case of error
+    if (bufferA) clReleaseMemObject(bufferA);
+    if (bufferB) clReleaseMemObject(bufferB);
+    if (bufferC) clReleaseMemObject(bufferC);
+    if (kernel) clReleaseKernel(kernel);
+    if (program) clReleaseProgram(program);
+    if (queue) clReleaseCommandQueue(queue);
+    if (context) clReleaseContext(context);
+
     // Free host arrays
     delete[] arrayA;
     delete[] arrayB;
     delete[] arrayC;
     return 0;
 }
-
