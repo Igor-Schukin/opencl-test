@@ -1,10 +1,24 @@
+/**
+ * @file 3.vector_cl.cpp
+ * @author Igor Schukin
+ * @date 2026-01-11
+ * @brief 
+ * Example of vector addition using OpenCL in C++17
+ * This program initializes two arrays with random float values,
+ * performs vector addition on an OpenCL device, and verifies the result.
+ * It includes error handling for OpenCL operations.
+ * @section requirements
+ * - OpenCL SDK installed
+ * - OpenCL-capable device (GPU/CPU)
+ * - C++17 compiler
+ */
 #include <iostream>
 #include <string>
 #include <CL/cl.h>
 
-// Check OpenCL and get the first available device ID
+// Check OpenCL and get the first available device ID or throw an error
 
-cl_device_id clInit() {
+cl_device_id getDeviceId() {
     cl_int error;
     cl_uint numPlatforms;
     cl_platform_id* platforms = nullptr;
@@ -49,6 +63,8 @@ cl_device_id clInit() {
     return device;
 }
 
+// OpenCL kernel for two vector addition
+
 const char* vectorAddKernelSource = R"(
     __kernel void vector_add
     (
@@ -61,6 +77,8 @@ const char* vectorAddKernelSource = R"(
         C[id] = A[id] + B[id];
     }
 )";
+
+// Main function to perform vector addition using OpenCL
 
 int main() {
 
@@ -87,7 +105,7 @@ int main() {
     cl_mem bufferC = nullptr;
 
     try {
-        cl_device_id device = clInit();
+        cl_device_id device = getDeviceId();
         cl_int error;
 
         // Prepare OpenCL context, command queue, program and kernel
