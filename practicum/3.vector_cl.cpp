@@ -1,22 +1,43 @@
 /**
  * @file 3.vector_cl.cpp
  * @author Igor Schukin
- * @date 2026-01-11
+ * @date 2026-01-13
  * @brief 
- * Example of vector addition using OpenCL in C++17
+ * Example of vector addition using OpenCL in C++
  * This program initializes two arrays with random float values,
  * performs vector addition on an OpenCL device, and verifies the result.
  * It includes error handling for OpenCL operations.
  * @section requirements
  * - OpenCL SDK installed
  * - OpenCL-capable device (GPU/CPU)
- * - C++17 compiler
+ * - C++11 compiler
+ * @section usage on HPC server
+ * 1. ssh to HPC server: 
+ *      ssh <user-name>@ui-2.hpc.rtu.lv
+ * 2. load or create file with this code
+ *      nano 3.vector_cl.cpp
+ * 3. load module with gcc and OpenCL support: 
+ *      module load compilers/gcc/gcc-11.2.0-nvptx
+ * 4. compile code: 
+ *      g++ -std=c++11 -o 3.vector_cl 3.vector_cl.cpp -I/usr/include/CL -L/usr/lib -lOpenCL
+ * 5. request interactive session with GPU:
+ *      qsub -l nodes=1:ppn=1:gpus=1 -I
+ * 6. run the program: 
+ *      ./3.vector_cl
  */
+
 #include <iostream>
 #include <string>
+#include <cstdlib>
+#include <ctime>
 #include <CL/cl.h>
 
-// Check OpenCL and get the first available device ID or throw an error
+/**
+ * @brief Check OpenCL and get the first available device ID or throw an error
+ * 
+ * @return cl_device_id 
+ */
+
 
 cl_device_id getDeviceId() {
     cl_int error;
@@ -63,7 +84,11 @@ cl_device_id getDeviceId() {
     return device;
 }
 
-// OpenCL kernel for two vector addition
+/**
+ * @brief OpenCL kernel source for vector addition
+ * 
+ * @return const char
+ */
 
 const char* vectorAddKernelSource = R"(
     __kernel void vector_add
@@ -78,12 +103,18 @@ const char* vectorAddKernelSource = R"(
     }
 )";
 
-// Main function to perform vector addition using OpenCL
+/**
+ * @brief Main function to perform vector addition using OpenCL
+ * 
+ * @return int 
+ */
 
 int main() {
 
     // Host arrays
     const int arraySize = 1024;
+    const float minRandomValue = 0.0f;
+    const float maxRandomValue = 10.0f;
     float* arrayA = new float[arraySize]; // Input array A
     float* arrayB = new float[arraySize]; // Input array B
     float* arrayC = new float[arraySize]; // Output array C
@@ -91,8 +122,8 @@ int main() {
     // Initialize input arrays with random values in range [0, 10]
     srand(static_cast<unsigned int>(time(0)));
     for (int i = 0; i < arraySize; i++) {
-        arrayA[i] = rand() % 1000 / 100.0f;
-        arrayB[i] = rand() % 1000 / 100.0f;
+        arrayA[i] = minRandomValue + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX/(maxRandomValue - minRandomValue)));
+        arrayB[i] = minRandomValue + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX/(maxRandomValue - minRandomValue)));
     }
 
     // OpenCL resources

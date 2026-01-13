@@ -1,6 +1,43 @@
+/**
+ * @file 1.platforms.cpp
+ * @author Igor Schukin
+ * @date 2026-01-13
+ * @brief Example of querying OpenCL platforms in C++
+ * @section requirements
+ * - OpenCL SDK installed
+ * - OpenCL-capable device (GPU/CPU)
+ * - C++11 compiler
+ * @section usage on HPC server
+ * 1. ssh to HPC server: 
+ *      ssh <user-name>@ui-2.hpc.rtu.lv
+ * 2. load or create file with this code
+ *      nano 1.platforms.cpp
+ * 3. load module with gcc and OpenCL support: 
+ *      module load compilers/gcc/gcc-11.2.0-nvptx
+ * 4. compile code: 
+ *      g++ -std=c++11 -o 1.platforms 1.platforms.cpp -I/usr/include/CL -L/usr/lib -lOpenCL
+ * 5. request interactive session with GPU:
+ *      qsub -l nodes=1:ppn=1:gpus=1 -I
+ * 6. run the program: 
+ *      ./1.platforms
+ */
+
 #include <iostream>
+#include <string>
+#include <stdexcept>
 #include <CL/cl.h>
 
+/**
+ * @brief Buffer sizes for querying OpenCL platform information
+ */
+const size_t SMALL_BUFFER_SIZE = 128;   // For short strings like names, versions
+const size_t LARGE_BUFFER_SIZE = 1024;  // For platform extensions list
+
+/**
+ * @brief Main function to query and display OpenCL platform information
+ * 
+ * @return int 
+ */
 int main() {
     cl_int error;
     cl_uint numPlatforms;
@@ -20,27 +57,29 @@ int main() {
 
         // Iterate over each platform and get info
         for (cl_uint i = 0; i < numPlatforms; i++) {
-            char platformName[128]{};
+            std::cout << "Platform #" << i << std::endl;
+            
+            char platformName[SMALL_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, sizeof(platformName), platformName, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform name: " << error << std::endl;
             else std::cout << "Platform Name: " << platformName << std::endl;
 
-            char platformProfile[128]{};
+            char platformProfile[SMALL_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_PROFILE, sizeof(platformProfile), platformProfile, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform profile: " << error << std::endl;
             else std::cout << "Platform Profile: " << platformProfile << std::endl;
 
-            char platformVendor[128]{};
+            char platformVendor[SMALL_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, sizeof(platformVendor), platformVendor, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform vendor: " << error << std::endl;
             else std::cout << "Platform Vendor: " << platformVendor << std::endl;
 
-            char platformVersion[128]{};
+            char platformVersion[SMALL_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_VERSION, sizeof(platformVersion), platformVersion, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform version: " << error << std::endl;
             else std::cout << "Platform Version: " << platformVersion << std::endl;
 
-            char platformExtensions[1024]{};
+            char platformExtensions[LARGE_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_EXTENSIONS, sizeof(platformExtensions), platformExtensions, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform extensions: " << error << std::endl;
             else std::cout << "Platform Extensions: " << platformExtensions << std::endl;

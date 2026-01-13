@@ -1,5 +1,44 @@
+/**
+ * @file 2.devices.cpp
+ * @author Igor Schukin
+ * @date 2026-01-13
+ * @brief Example of querying OpenCL platforms and devices in C++
+ * @section requirements
+ * - OpenCL SDK installed
+ * - OpenCL-capable device (GPU/CPU)
+ * - C++11 compiler
+ * @section usage on HPC server
+ * 1. ssh to HPC server: 
+ *      ssh <user-name>@ui-2.hpc.rtu.lv
+ * 2. load or create file with this code
+ *      nano 2.devices.cpp
+ * 3. load module with gcc and OpenCL support: 
+ *      module load compilers/gcc/gcc-11.2.0-nvptx
+ * 4. compile code: 
+ *      g++ -std=c++11 -o 2.devices 2.devices.cpp -I/usr/include/CL -L/usr/lib -lOpenCL
+ * 5. request interactive session with GPU:
+ *      qsub -l nodes=1:ppn=1:gpus=1 -I
+ * 6. run the program: 
+ *      ./2.devices
+ */
+
 #include <iostream>
+#include <string>
+#include <stdexcept>
 #include <CL/cl.h>
+
+/**
+ * @brief Buffer sizes for querying OpenCL platform and device information
+ */
+const size_t SMALL_BUFFER_SIZE = 128;    // For short strings like names, versions
+const size_t MEDIUM_BUFFER_SIZE = 1024;  // For platform extensions list
+const size_t LARGE_BUFFER_SIZE = 2048;   // For device extensions list
+
+/**
+ * @brief Main function to query and display OpenCL platform and device information
+ * 
+ * @return int 
+ */
 
 int main() {
     cl_int error;
@@ -20,27 +59,27 @@ int main() {
 
         // Iterate over each platform and get info
         for (cl_uint i = 0; i < numPlatforms; i++) {
-            char platformName[128]{};
+            char platformName[SMALL_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, sizeof(platformName), platformName, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform name: " << error << std::endl;
             else std::cout << "Platform Name: " << platformName << std::endl;
 
-            char platformProfile[128]{};
+            char platformProfile[SMALL_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_PROFILE, sizeof(platformProfile), platformProfile, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform profile: " << error << std::endl;
             else std::cout << "Platform Profile: " << platformProfile << std::endl;
 
-            char platformVendor[128]{};
+            char platformVendor[SMALL_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, sizeof(platformVendor), platformVendor, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform vendor: " << error << std::endl;
             else std::cout << "Platform Vendor: " << platformVendor << std::endl;
 
-            char platformVersion[128]{};
+            char platformVersion[SMALL_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_VERSION, sizeof(platformVersion), platformVersion, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform version: " << error << std::endl;
             else std::cout << "Platform Version: " << platformVersion << std::endl;
 
-            char platformExtensions[1024]{};
+            char platformExtensions[MEDIUM_BUFFER_SIZE]{};
             error = clGetPlatformInfo(platforms[i], CL_PLATFORM_EXTENSIONS, sizeof(platformExtensions), platformExtensions, NULL);
             if (error != CL_SUCCESS) std::cout << "Error getting platform extensions: " << error << std::endl;
             else std::cout << "Platform Extensions: " << platformExtensions << std::endl;
@@ -61,81 +100,81 @@ int main() {
                 for (cl_uint j = 0; j < numDevices; j++) {
                     std::cout << "------------------------------------" << std::endl;
 
-                    char deviceDriverVersion[128]{};
-                    error = clGetDeviceInfo(devices[j], CL_DRIVER_VERSION, sizeof(deviceDriverVersion), deviceDriverVersion, NULL);
+                    char driverVersion[SMALL_BUFFER_SIZE]{};
+                    error = clGetDeviceInfo(devices[j], CL_DRIVER_VERSION, sizeof(driverVersion), driverVersion, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device driver version: " << error << std::endl;
-                    else std::cout << "deviceDriverVersion: " << deviceDriverVersion << std::endl;
+                    else std::cout << "Driver Version: " << driverVersion << std::endl;
 
-                    char deviceProfile[128]{};
+                    char deviceProfile[SMALL_BUFFER_SIZE]{};
                     error = clGetDeviceInfo(devices[j], CL_DEVICE_PROFILE, sizeof(deviceProfile), deviceProfile, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device profile: " << error << std::endl;
-                    else std::cout << "deviceProfile: " << deviceProfile << std::endl;
+                    else std::cout << "Device Profile: " << deviceProfile << std::endl;
 
-                    char deviceVendor[128]{};
+                    char deviceVendor[SMALL_BUFFER_SIZE]{};
                     error = clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR, sizeof(deviceVendor), deviceVendor, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device vendor: " << error << std::endl;
-                    else  std::cout << "deviceVendor: " << deviceVendor << std::endl;
+                    else  std::cout << "Device Vendor: " << deviceVendor << std::endl;
 
-                    char deviceVersion[128]{};
+                    char deviceVersion[SMALL_BUFFER_SIZE]{};
                     error = clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, sizeof(deviceVersion), deviceVersion, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device version: " << error << std::endl;
-                    else std::cout << "deviceVersion: " << deviceVersion << std::endl;
+                    else std::cout << "Device Version: " << deviceVersion << std::endl;
 
-                    char deviceName[128]{};
+                    char deviceName[SMALL_BUFFER_SIZE]{};
                     error = clGetDeviceInfo(devices[j], CL_DEVICE_NAME, sizeof(deviceName), deviceName, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device name: " << error << std::endl;
-                    else std::cout << "deviceName: " << deviceName << std::endl;
+                    else std::cout << "Device Name: " << deviceName << std::endl;
 
-                    cl_uint deviceAddressBits;
-                    error = clGetDeviceInfo(devices[j], CL_DEVICE_ADDRESS_BITS, sizeof(deviceAddressBits), &deviceAddressBits, NULL);
+                    cl_uint addressBits;
+                    error = clGetDeviceInfo(devices[j], CL_DEVICE_ADDRESS_BITS, sizeof(addressBits), &addressBits, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device address bits: " << error << std::endl;
-                    else std::cout << "deviceAddressBits: " << deviceAddressBits << std::endl;
+                    else std::cout << "Address Bits: " << addressBits << std::endl;
 
-                    cl_bool deviceAvailable;
-                    error = clGetDeviceInfo(devices[j], CL_DEVICE_AVAILABLE, sizeof(deviceAvailable), &deviceAvailable, NULL);
+                    cl_bool isAvailable;
+                    error = clGetDeviceInfo(devices[j], CL_DEVICE_AVAILABLE, sizeof(isAvailable), &isAvailable, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device available: " << error << std::endl;
-                    else std::cout << "deviceAvailable: " << (deviceAvailable ? "True" : "False") << std::endl;
+                    else std::cout << "Device Available: " << (isAvailable ? "True" : "False") << std::endl;
 
-                    cl_bool deviceCompilerAvailable;
-                    error = clGetDeviceInfo(devices[j], CL_DEVICE_COMPILER_AVAILABLE, sizeof(deviceCompilerAvailable), &deviceCompilerAvailable, NULL);
+                    cl_bool compilerAvailable;
+                    error = clGetDeviceInfo(devices[j], CL_DEVICE_COMPILER_AVAILABLE, sizeof(compilerAvailable), &compilerAvailable, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device compiler available: " << error << std::endl;
-                    else std::cout << "deviceCompilerAvailable: " << (deviceCompilerAvailable ? "True" : "False") << std::endl;
+                    else std::cout << "Compiler Available: " << (compilerAvailable ? "True" : "False") << std::endl;
 
-                    cl_uint deviceGlobalMemCachelineSize;
-                    error = clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, sizeof(deviceGlobalMemCachelineSize), &deviceGlobalMemCachelineSize, NULL);
+                    cl_uint globalMemCachelineSize;
+                    error = clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, sizeof(globalMemCachelineSize), &globalMemCachelineSize, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device global mem cacheline size: " << error << std::endl;
-                    else std::cout << "deviceGlobalMemCachelineSize: " << deviceGlobalMemCachelineSize << std::endl;
+                    else std::cout << "Global Mem Cacheline Size: " << globalMemCachelineSize << std::endl;
 
                     cl_platform_id devicePlatform;
                     error = clGetDeviceInfo(devices[j], CL_DEVICE_PLATFORM, sizeof(devicePlatform), &devicePlatform, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device platform: " << error << std::endl;
-                    else std::cout << "devicePlatform: " << devicePlatform << std::endl;
+                    else std::cout << "Device Platform ID: " << devicePlatform << std::endl;
 
                     cl_device_type deviceType;
                     error = clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(deviceType), &deviceType, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device type: " << error << std::endl;
-                    else std::cout << "deviceType: " << deviceType << std::endl;
+                    else std::cout << "Device Type: " << deviceType << std::endl;
 
-                    cl_uint deviceVendorId;
-                    error = clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR_ID, sizeof(deviceVendorId), &deviceVendorId, NULL);
+                    cl_uint vendorId;
+                    error = clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR_ID, sizeof(vendorId), &vendorId, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device vendor id: " << error << std::endl;
-                    else std::cout << "deviceVendorId: " << deviceVendorId << std::endl;
+                    else std::cout << "Vendor ID: " << vendorId << std::endl;
 
-                    cl_uint deviceMaxComputeUnits;
-                    error = clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(deviceMaxComputeUnits), &deviceMaxComputeUnits, NULL);
+                    cl_uint maxComputeUnits;
+                    error = clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(maxComputeUnits), &maxComputeUnits, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device max compute units: " << error << std::endl;
-                    else std::cout << "deviceMaxComputeUnits: " << deviceMaxComputeUnits << std::endl;
+                    else std::cout << "Max Compute Units: " << maxComputeUnits << std::endl;
 
-                    size_t deviceMaxWorkGroupSize;
-                    error = clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(deviceMaxWorkGroupSize), &deviceMaxWorkGroupSize, NULL);
+                    size_t maxWorkGroupSize;
+                    error = clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroupSize), &maxWorkGroupSize, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device max work group size: " << error << std::endl;
-                    else std::cout << "deviceMaxWorkGroupSize: " << deviceMaxWorkGroupSize << std::endl;
+                    else std::cout << "Max Work Group Size: " << maxWorkGroupSize << std::endl;
 
                     std::cout << "------------------------" << std::endl;
-                    char deviceExtensions[2048]{};
+                    char deviceExtensions[LARGE_BUFFER_SIZE]{};
                     error = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, sizeof(deviceExtensions), deviceExtensions, NULL);
                     if (error != CL_SUCCESS) std::cout << "Error getting device extensions: " << error << std::endl;
-                    else std::cout << "deviceExtensions: " << deviceExtensions << std::endl;
+                    else std::cout << "Device Extensions: " << deviceExtensions << std::endl;
 
                 }
             } catch (const std::exception& e) {
