@@ -1,5 +1,5 @@
 /**
- * @file 3.vector_cl.cpp
+ * @file 3.vector.cpp
  * @author Igor Schukin
  * @date 2026-01-13
  * @brief 
@@ -15,15 +15,15 @@
  * 1. ssh to HPC server: 
  *      ssh <user-name>@ui-2.hpc.rtu.lv
  * 2. load or create file with this code
- *      nano 3.vector_cl.cpp
+ *      nano 3.vector.cpp
  * 3. load module with gcc and OpenCL support: 
  *      module load compilers/gcc/gcc-11.2.0-nvptx
  * 4. compile code: 
- *      g++ -std=c++11 -o 3.vector_cl 3.vector_cl.cpp -I/usr/include/CL -L/usr/lib -lOpenCL
+ *      g++ -std=c++11 -o 3.vector 3.vector.cpp -I/usr/include/CL -L/usr/lib -lOpenCL
  * 5. request interactive session with GPU:
  *      qsub -l nodes=1:ppn=1:gpus=1 -I
  * 6. run the program: 
- *      ./3.vector_cl
+ *      ./3.vector
  */
 
 #include <iostream>
@@ -86,20 +86,18 @@ cl_device_id getDeviceId() {
 
 /**
  * @brief OpenCL kernel source for vector addition
- * 
- * @return const char
  */
 
 const char* vectorAddKernelSource = R"(
     __kernel void vector_add
     (
-        __global const float* A, 
-        __global const float* B, 
-        __global float* C
+        __global const float* a, 
+        __global const float* b, 
+        __global float* c
     ) 
     {
         int id = get_global_id(0);
-        C[id] = A[id] + B[id];
+        c[id] = a[id] + b[id];
     }
 )";
 
@@ -112,7 +110,7 @@ const char* vectorAddKernelSource = R"(
 int main() {
 
     // Host arrays
-    const int arraySize = 1024;
+    const int arraySize = 1024; // Size of the arrays >= 10
     const float minRandomValue = 0.0f;
     const float maxRandomValue = 10.0f;
     float* arrayA = new float[arraySize]; // Input array A
@@ -202,7 +200,7 @@ int main() {
         std::cerr << "An unknown error occurred." << std::endl;
     }
 
-    // Clean up OpenCL resources in case of error
+    // Clean up OpenCL resourcess
     if (bufferA) clReleaseMemObject(bufferA);
     if (bufferB) clReleaseMemObject(bufferB);
     if (bufferC) clReleaseMemObject(bufferC);
