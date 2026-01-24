@@ -2,9 +2,12 @@
  * @file 5.raytracing.cpp
  * @brief A simple raytracer that generates a BMP image of a sphere with lighting.
  * @date 2026-01-21
- * @section usage
+ * @section usage on Windows
  *   g++ -std=c++11 -Wall -o 5.raytracing.exe 5.raytracing.cpp -lm -static-libstdc++ -static
- *   ./5.raytracing.exe
+ *   .\5.raytracing.exe
+ * @section usage on Linux
+ *   g++ -std=c++11 -Wall -o 5.raytracing 5.raytracing.cpp
+ *   ./5.raytracing
  */
 
 #include <iostream>
@@ -13,6 +16,7 @@
 #include <cstdint>
 #include <string>
 #include <cmath>
+#include <stdexcept>
 
 /**
  * @brief A simple BMP image class to create and save 24-bit BMP files.
